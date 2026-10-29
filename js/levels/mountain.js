@@ -2,10 +2,10 @@
 /* ======================= MOUNTAIN ======================= */
 // The cliff with the flower: long ledges going up and back (at most 70 up, gap at most 70), see tests/mountain_reach.js
 const MTN_CLIFF = [
-  { x: 640, h: 70, w: 180 },
-  { x: 880, h: 140, w: 300 },
-  { x: 1230, h: 210, w: 240 },
-  { x: 880, h: 280, w: 280 }
+  { x: 440, h: 70, w: 180 },
+  { x: 680, h: 140, w: 300 },
+  { x: 1030, h: 210, w: 240 },
+  { x: 680, h: 280, w: 280 }
 ];
 function buildMountain() {
   const L = baseLevel(2, 'mountain', 4800);
@@ -28,7 +28,7 @@ function buildMountain() {
   addGate(L, 'boulders');
   orbArc(L, 300, GY - 40, 6, 220, 60);
   orbArc(L, 560, GY - 80, 5, 140, 40);
-  orbArc(L, 1000, GY - 170, 3, 80, 0);
+  orbArc(L, 800, GY - 170, 3, 80, 0);
   orbArc(L, 1250, GY - 40, 6, 220, 60);
   orbArc(L, 1830, 150, 4, 120, 0);
   orbArc(L, 2100, GY - 40, 6, 220, 60);
@@ -39,7 +39,7 @@ function buildMountain() {
   orbArc(L, 3900, GY - 100, 5, 160, 40);
   orbArc(L, 4310, 290, 3, 80, 0);
   orbArc(L, 4400, GY - 40, 6, 200, 60);
-  L.items.push(mkItem('flower', 1000, GY - 280 - 14)); // on the top ledge of the cliff
+  L.items.push(mkItem('flower', 760, GY - 280 - 14)); // more than 1050 from the hive, so the bees are not lured from the start // on the top ledge of the cliff
   L.enemies.push(
     mkSpider(1050, 0),
     mkSpider(2250, 3),
@@ -74,7 +74,8 @@ function buildMountain() {
     // flower lure
     const fl = L.items.find(i => i.type === 'flower');
     p.flowerAt = null;
-    if (fl && fl.state === 'ground' && fl.rest) {
+    if (G.held && G.held.type === 'flower') p.flowerTaken = true;
+    if (fl && p.flowerTaken && fl.state === 'ground' && fl.rest) { // only a flower that Bella has put down lures the bees
       const d = Math.abs(fl.x - HIVE.x);
       if (d > 280 && d < 1050) p.flowerAt = { x: fl.x, y: fl.y - 18 };
     }
