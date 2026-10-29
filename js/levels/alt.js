@@ -3,7 +3,7 @@ const ALT_LAYOUTS = [
   { exit: 'A', dest: { B: 'A', C: 'A', D: 'A', E: 'A' } },
   { exit: 'C', dest: { A: 'start', B: 'A', D: 'B', E: 'D' } },
   { exit: 'D', dest: { A: 'E', B: 'C', C: 'start', E: 'A' } },
-  { exit: 'B', dest: { A: 'D', C: 'E', D: 'start', E: 'C' } }
+  { exit: 'E', dest: { A: 'start', B: 'A', C: 'B', D: 'C' } } // the last one: the way out is at the far end, and the false portals send her back
 ];
 // Long floating platforms {x, h (height above the ground), w}: each alternate world visit has its own route, so they do not feel alike.
 // Each platform is reached from the one before it (at most 70 up, gap at most 70, see tests/alt_reach.js); the first from the ground.
@@ -49,7 +49,8 @@ const ALT_SHADOWS = {
   S3: { x1: 2300, x2: 2640, y: GY },
   S4: { x1: 3050, x2: 3500, y: GY },
   S5: { x1: 3720, x2: 3940, y: GY },
-  S6: { x1: 4350, x2: 4720, y: GY }
+  S6: { x1: 4350, x2: 4720, y: GY },
+  S9: { x1: 1850, x2: 2250, y: GY }
 };
 
 function mkShadow(def, P) {

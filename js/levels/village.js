@@ -39,11 +39,14 @@ function buildVillage() {
   );
   L.enemies.push(
     mkSpider(1650, 0),
+    mkSpider(2300, 3),
     mkSpider(3050, 2),
     mkSpider(4200, 4),
     mkWasp(600, 230),
     mkWasp(4000, 240),
     mkBoar(1000, 1450),
+    mkBoar(1650, 1950),
+    mkBoar(2800, 3200),
     mkBoar(3900, 4300)
   );
   const dog = {

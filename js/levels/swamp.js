@@ -57,7 +57,7 @@ function buildSwamp() {
     creakT: 0,
     msgT: 0
   });
-  L.enemies.push(mkSpider(900, 0), mkSpider(1450, 2.5), mkSpider(3250, 1), mkSpider(4150, 4));
+  L.enemies.push(mkSpider(900, 0), mkSpider(1450, 2.5), mkSpider(2330, 1.5), mkSpider(3250, 1), mkSpider(4150, 4), mkWasp(1500, 230), mkWasp(3700, 240));
   [1800, 2000, 2320, 2530, 2700, 2830].forEach((x, i) => L.enemies.push(mkCroc(x, i % 2 ? -1 : 1)));
   const POD_X = 520,
     POD_Y = towerDeckY('swamp', 520), // the seed plant grows on top of the first mangrove

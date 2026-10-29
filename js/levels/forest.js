@@ -40,6 +40,7 @@ function buildForest() {
     mkGrassSnake(3300),
     mkGrassSnake(3800),
     mkGrassSnake(4250),
+    mkSpider(2200, 2),
     mkSpider(3050, 1),
     mkSpider(4000, 3.5)
   );

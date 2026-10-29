@@ -41,7 +41,9 @@ function buildMountain() {
   orbArc(L, 4400, GY - 40, 6, 200, 60);
   L.items.push(mkItem('flower', 760, GY - 280 - 14)); // more than 1050 from the hive, so the bees are not lured from the start // on the top ledge of the cliff
   L.enemies.push(
+    mkSpider(800, 2),
     mkSpider(1050, 0),
+    mkBoar(2450, 2950),
     mkSpider(2250, 3),
     mkSpider(2900, 1.5),
     mkSpider(4000, 5),

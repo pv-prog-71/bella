@@ -214,8 +214,8 @@ function playUpdate(dt) {
       if (G.tele.t > 1) G.tele = null;
     }
   } else {
-    // health regeneration (casual game): slow, after a few seconds without damage
-    if (G.sinceHurt > 4 && G.hp < 100) G.hp = Math.min(100, G.hp + 4 * dt);
+    // health regeneration: slow, after several seconds without damage
+    if (G.sinceHurt > 6 && G.hp < 100) G.hp = Math.min(100, G.hp + 2 * dt);
     // gate / exit
     if (L.gate && !G.puz[L.idx]) {
       if (b.x > L.exitX - 70 && G.gateToastT <= 0) {
