@@ -10,6 +10,8 @@
 //   dir       1 = as drawn (facing right), -1 = mirrored
 //   scale     size multiplier
 //   rotation  radians; rotateBeforeFlip says whether the rotation happens before or after the mirror
+// sprite scale: the eagles were too big next to Bella and the spiders a bit big
+const EAGLE_SCALE = 0.7, SPIDER_SCALE = 0.82;
 function drawClip(ctx, clipName, x, y, time, options) {
   const sprite = IMG['creatures/' + clipName];
   if (!sprite) return;
@@ -79,7 +81,7 @@ function drawSpider(ctx, x, y, o) {
   ctx.moveTo(x, threadTop);
   ctx.lineTo(x, y - 10);
   ctx.stroke();
-  drawClip(ctx, 'spider', x, y, o.t || 0);
+  drawClip(ctx, 'spider', x, y, o.t || 0, { scale: SPIDER_SCALE });
 }
 
 function drawBear(ctx, x, y, o) {
@@ -102,7 +104,7 @@ function drawWasp(ctx, x, y, o) {
 // o.ang: tilt in radians (diving). The tilt is applied before the mirror, as the original painter did.
 function drawEagle(ctx, x, y, o) {
   drawClip(ctx, o.dive ? 'eagle_dive' : 'eagle_fly', x, y, o.t || 0, {
-    dir: o.dir, rotation: o.ang || 0, rotateBeforeFlip: true
+    dir: o.dir, rotation: o.ang || 0, rotateBeforeFlip: true, scale: EAGLE_SCALE
   });
 }
 

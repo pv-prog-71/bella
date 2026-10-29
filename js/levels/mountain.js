@@ -1,39 +1,45 @@
 /* Level 3 - Mountain (bear + flower / honey puzzle) */
 /* ======================= MOUNTAIN ======================= */
+// The cliff with the flower: long ledges going up and back (at most 70 up, gap at most 70), see tests/mountain_reach.js
+const MTN_CLIFF = [
+  { x: 640, h: 70, w: 180 },
+  { x: 880, h: 140, w: 300 },
+  { x: 1230, h: 210, w: 240 },
+  { x: 880, h: 280, w: 280 }
+];
 function buildMountain() {
   const L = baseLevel(2, 'mountain', 4800);
   L.name = tr('level.mountain');
   L.nextName = tr('level.village');
   L.theme = 'mountain';
   const HIVE = { x: 1900, y: 146 },
-    BEAR = { x: 3380 };
-  L.solids.push(ground(0, 4800), hill(520, 200, 30), hill(2400, 230, 40), hill(3800, 200, 34));
+    BEAR = { x: 3560, y: GY - 120 }; // the bear waits in a cave up on a shelf: the ground rises towards it
+  L.solids.push(ground(0, 4800), hill(520, 200, 30), hill(2400, 230, 40), hill(3820, 200, 34));
+  L.solids.push(hill(3130, 160, 40), hill(3260, 160, 80), hill(3390, 430, 120)); // the slope up to the shelf
   L.solids.push(
     plat(1480, 325, 130, 18, 'ledge'),
     plat(1640, 250, 110, 18, 'ledge'),
     plat(1780, 185, 240, 22, 'ledge')
   );
-  L.solids.push(
-    plat(980, 320, 130, 18, 'ledge'),
-    plat(3000, 320, 130, 18, 'ledge'),
-    plat(4250, 320, 130, 18, 'ledge')
-  );
+  // a switchback up a cliff (long ledges, not a tower): the flower grows on the top one
+  MTN_CLIFF.forEach(q => L.solids.push(plat(q.x, GY - q.h, q.w, 18, 'ledge')));
+  L.solids.push(plat(4250, 320, 130, 18, 'ledge'));
   L.exitX = 4640;
   addGate(L, 'boulders');
   orbArc(L, 300, GY - 40, 6, 220, 60);
   orbArc(L, 560, GY - 80, 5, 140, 40);
-  orbArc(L, 1040, 290, 3, 80, 0);
+  orbArc(L, 1000, GY - 170, 3, 80, 0);
   orbArc(L, 1250, GY - 40, 6, 220, 60);
   orbArc(L, 1830, 150, 4, 120, 0);
   orbArc(L, 2100, GY - 40, 6, 220, 60);
   orbArc(L, 2500, GY - 100, 6, 200, 40);
   orbArc(L, 2800, GY - 40, 6, 220, 60);
-  orbArc(L, 3060, 290, 3, 80, 0);
+  orbArc(L, 3200, GY - 90, 3, 60, 0);
   orbArc(L, 3650, GY - 40, 6, 220, 60);
   orbArc(L, 3900, GY - 100, 5, 160, 40);
   orbArc(L, 4310, 290, 3, 80, 0);
   orbArc(L, 4400, GY - 40, 6, 200, 60);
-  L.items.push(mkItem('flower', 3680, towerDeckY('mountain', 3680) - 14)); // on top of the second rock pillar
+  L.items.push(mkItem('flower', 1000, GY - 280 - 14)); // on the top ledge of the cliff
   L.enemies.push(
     mkSpider(1050, 0),
     mkSpider(2250, 3),
@@ -60,7 +66,8 @@ function buildMountain() {
     const b = G.bella;
     L.t += dt;
     if (p.msgT > 0) p.msgT -= dt;
-    if (!p.spoke && b.x > 2930 && onScreen(BEAR.x, GY - 60) && (p.seen = (p.seen || 0) + dt) > 0.9) {
+    // she only finds the bear after climbing the slope to his cave
+    if (!p.spoke && Math.abs(b.x - BEAR.x) < 300 && b.y < GY - 90 && onScreen(BEAR.x, BEAR.y - 60) && (p.seen = (p.seen || 0) + dt) > 0.6) {
       p.spoke = true;
       G.openDialog('Bear', tr('dlg.bear.ask'));
     }
@@ -116,12 +123,12 @@ function buildMountain() {
   };
   L.onUse = function (it) {
     const b = G.bella;
-    if (it.type === 'honey' && !p.eat && Math.abs(b.x - BEAR.x) < 200) {
+    if (it.type === 'honey' && !p.eat && Math.abs(b.x - BEAR.x) < 200 && Math.abs(b.y - BEAR.y) < 100) {
       G.held = null;
       L.items = L.items.filter(i => i !== it);
       p.eat = 0.01;
       SND.sfx('crunch');
-      G.say(BEAR.x, GY - 150, tr('bubble.nom'), 2.6);
+      G.say(BEAR.x, BEAR.y - 150, tr('bubble.nom'), 2.6);
       return true;
     }
     if (it.type === 'flower') {
@@ -135,7 +142,7 @@ function buildMountain() {
     if (p.done || !p.spoke) return null; // no hint before the puzzle has started
     const fl = L.items.find(i => i.type === 'flower');
     if (G.held && G.held.type === 'honey')
-      return { x: BEAR.x, y: GY - 150, text: tr('hint.mtn.bear') };
+      return { x: BEAR.x, y: BEAR.y - 150, text: tr('hint.mtn.bear') };
     // the arrow follows what the player would think of first: the bear wants honey, so the honey comes first;
     // the flower is only suggested after the bees have shown that the hive is guarded
     if (G.held && G.held.type === 'flower')
@@ -156,7 +163,24 @@ function buildMountain() {
       ell(c, HIVE.x, HIVE.y + 50, 9, 11);
       c.fill();
     }
-    drawBear(c, BEAR.x, GY, {
+    // the cave behind the bear
+    c.fillStyle = '#2a2d33';
+    c.beginPath();
+    c.moveTo(BEAR.x - 130, BEAR.y);
+    c.lineTo(BEAR.x - 130, BEAR.y - 90);
+    c.quadraticCurveTo(BEAR.x, BEAR.y - 230, BEAR.x + 130, BEAR.y - 90);
+    c.lineTo(BEAR.x + 130, BEAR.y);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#14161a';
+    c.beginPath();
+    c.moveTo(BEAR.x - 100, BEAR.y);
+    c.lineTo(BEAR.x - 100, BEAR.y - 80);
+    c.quadraticCurveTo(BEAR.x, BEAR.y - 195, BEAR.x + 100, BEAR.y - 80);
+    c.lineTo(BEAR.x + 100, BEAR.y);
+    c.closePath();
+    c.fill();
+    drawBear(c, BEAR.x, BEAR.y, {
       t,
       hurt: !p.bearHappy,
       dir: -1,
@@ -164,7 +188,7 @@ function buildMountain() {
     });
     if (p.eat > 0 && !p.done) {
       c.fillStyle = '#e8a014';
-      ell(c, BEAR.x - 38, GY - 90 + Math.sin(t * 8) * 3, 5, 5);
+      ell(c, BEAR.x - 38, BEAR.y - 90 + Math.sin(t * 8) * 3, 5, 5);
       c.fill();
     }
     p.bees.forEach(bee => drawBee(c, bee.x, bee.y, L.t + bee.ph, { dir: bee.dir }));

@@ -11,11 +11,18 @@ function grassTuft(c, x, y) {
     c.stroke();
   }
 }
+// Height of the ground surface under x (the ground itself, or the top of a hill)
+function floorHeightAt(x) {
+  let y = GY;
+  for (const s of G.L.solids) if (!s.oneway && !s.gate && x > s.x && x < s.x + s.w && s.y < y) y = s.y;
+  return y;
+}
 function mkGrassSnake(x) {
   return {
     name: 'snake',
     x,
     home: x,
+    gy: null, // ground height at home, set on the first update (the snake never leaves ground of that height)
     rise: 0,
     st: 0,
     dir: 1,
@@ -23,10 +30,11 @@ function mkGrassSnake(x) {
     t: Math.random() * 5,
     update(dt) {
       this.t += dt;
+      if (this.gy == null) this.gy = floorHeightAt(this.home);
       const b = G.bella,
         dx = b.x - this.x;
       if (this.st === 0) {
-        if (Math.abs(dx) < 170 && Math.abs(b.y - GY) < 70) {
+        if (Math.abs(dx) < 170 && Math.abs(b.y - this.gy) < 70) {
           this.st = 1;
           SND.sfx('snake_hiss');
           setTimeout(() => SND.sfx('bella_bark'), 180); // Bella reacts to the snake
@@ -35,7 +43,9 @@ function mkGrassSnake(x) {
         this.rise = Math.min(1, this.rise + dt * 3);
         this.dir = dx > 0 ? 1 : -1;
         if (this.rise >= 1) {
-          this.x = clamp(this.x + (dx > 0 ? 1 : -1) * 72 * dt, this.home - 180, this.home + 180);
+          const nx = clamp(this.x + (dx > 0 ? 1 : -1) * 72 * dt, this.home - 180, this.home + 180);
+          // do not slither into a hill or off its edge: stay where the ground is at the same height as at home
+          if (floorHeightAt(nx - 36) === this.gy && floorHeightAt(nx + 36) === this.gy) this.x = nx;
           if (Math.abs(dx) > 360) this.st = 2;
         }
       } else {
@@ -47,16 +57,17 @@ function mkGrassSnake(x) {
       }
     },
     box() {
-      return this.rise > 0.6 ? { x: this.x - 34, y: GY - 26, w: 68, h: 26 } : null;
+      return this.rise > 0.6 ? { x: this.x - 34, y: this.gy - 26, w: 68, h: 26 } : null;
     },
     draw(c, t) {
-      grassTuft(c, this.x - 10, GY);
-      grassTuft(c, this.x + 12, GY);
-      if (this.rise > 0) drawSnake(c, this.x, GY, { dir: this.dir, rise: this.rise, t, len: 76 });
+      const gy = this.gy == null ? GY : this.gy;
+      grassTuft(c, this.home - 10, gy); // the grass stays at the snake's home, it does not follow the snake
+      grassTuft(c, this.home + 12, gy);
+      if (this.rise > 0) drawSnake(c, this.x, gy, { dir: this.dir, rise: this.rise, t, len: 76 });
       else {
         c.fillStyle = 'rgba(255,225,60,0.9)';
         if (Math.sin(t * 1.3 + this.home) > 0.8) {
-          ell(c, this.x, GY - 6, 1.6, 1.6);
+          ell(c, this.x, gy - 6, 1.6, 1.6);
           c.fill();
         }
       }
@@ -83,7 +94,7 @@ function mkSpider(x, phase) {
               : 120;
     },
     box() {
-      return { x: this.x - 14, y: this.y - 12, w: 28, h: 30 };
+      return { x: this.x - 12, y: this.y - 10, w: 24, h: 25 };
     },
     draw(c, t) {
       drawSpider(c, this.x, this.y, { t, top: -20 });
@@ -133,14 +144,17 @@ function mkEagle(x1, x2) {
     sy: 0,
     dive: 0,
     warn: 0,
+    ty: GY - 34,
+    cy: 66,
     update(dt) {
       const b = G.bella,
         active = b.x > this.zone[0] && b.x < this.zone[1];
       this.t += dt;
+      this.cy += (Math.min(66, b.y - 170) - this.cy) * Math.min(1, dt * 1.5); // cruises above Bella, also when she is up on a ledge or tower
       if (this.st === 'cruise') {
         const goal = b.x + Math.sin(this.t * 0.45) * 340;
         this.x += (goal - this.x) * Math.min(1, dt * 1.2);
-        this.y = 66 + Math.sin(this.t * 1.1) * 12;
+        this.y = this.cy + Math.sin(this.t * 1.1) * 12;
         this.dir = Math.cos(this.t * 0.45) > 0 ? 1 : -1;
         if (active && !G.altInvis) this.timer -= dt;
         if (this.timer <= 0) {
@@ -156,6 +170,7 @@ function mkEagle(x1, x2) {
           this.st = 'dive';
           this.dive = 0;
           this.tx = b.x;
+          this.ty = Math.min(GY - 34, b.y - 20); // dives at the height Bella is at now
           this.sx = this.x;
           this.sy = this.y;
           SND.sfx('swoosh');
@@ -164,7 +179,7 @@ function mkEagle(x1, x2) {
         this.dive += dt / 1.0;
         const u = Math.min(1, this.dive);
         this.x = lerp(this.sx, this.tx, u);
-        this.y = lerp(this.sy, GY - 34, u * u);
+        this.y = lerp(this.sy, this.ty, u * u);
         this.dir = this.tx > this.sx ? 1 : -1;
         if (this.dive >= 1.18) {
           this.st = 'climb';
@@ -176,7 +191,7 @@ function mkEagle(x1, x2) {
         this.dive += dt / 1.4;
         const u = Math.min(1, this.dive);
         this.x = this.sx + this.dir * 220 * u;
-        this.y = lerp(this.sy, 66, ease(u));
+        this.y = lerp(this.sy, this.cy, ease(u));
         if (u >= 1) {
           this.st = 'cruise';
           this.timer = 7 + Math.random() * 4;
@@ -185,13 +200,13 @@ function mkEagle(x1, x2) {
     },
     box() {
       return this.st === 'dive' && this.dive > 0.55
-        ? { x: this.x - 30, y: this.y - 14, w: 60, h: 34 }
+        ? { x: this.x - 22, y: this.y - 10, w: 44, h: 26 }
         : null;
     },
     draw(c, t) {
       const ang =
         this.st === 'dive'
-          ? Math.atan2(GY - 34 - this.sy, this.tx - this.sx || 1) * 0.0 + 0.55 * this.dir
+          ? Math.atan2(this.ty - this.sy, this.tx - this.sx || 1) * 0.0 + 0.55 * this.dir
           : 0;
       drawEagle(c, this.x, this.y, {
         t,

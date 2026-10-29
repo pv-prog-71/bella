@@ -32,7 +32,7 @@ function playUpdate(dt) {
   if (G.dialog) {
     G.dialog.t += dt;
     // pan the camera so the speaking animal is on screen
-    const sx = { Chameleon: 3036, Frog: L.p && L.p.frogX, Bear: 3380, Stingray: 3560 }[
+    const sx = { Chameleon: 3036, Frog: L.p && L.p.frogX, Bear: 3560, Stingray: 3560 }[
       G.dialog.who
     ];
     if (sx != null && !G.alt) {

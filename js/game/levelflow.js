@@ -15,7 +15,7 @@ function applyDone(L) {
   if (L.idx === 1) {
     p.plank = true;
     p.frogDone = true;
-    p.frogX = 3040;
+    p.frogX = 1500;
     p.bird = 'gone';
     p.branchSpawned = true;
     p.seeds = 3;

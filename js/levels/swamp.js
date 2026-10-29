@@ -1,23 +1,28 @@
 /* Level 2 - Swamps (frog + seeds / branch / plank puzzle) */
 /* ======================= SWAMPS ======================= */
+// Small ledges over the gap (up 70 / down 70, gaps of at most 70), usable in both directions: the way across before the branch bridge
+const SWAMP_CROSS = [
+  { x: 2200, h: 70, w: 110 },
+  { x: 2370, h: 140, w: 110 },
+  { x: 2500, h: 70, w: 100 }
+];
 function buildSwamp() {
   const L = baseLevel(1, 'swamp', 4800);
   L.name = tr('level.swamp');
   L.nextName = tr('level.mountain');
   L.theme = 'swamp';
   const GAP0 = 2190,
-    GAP1 = 2480;
+    GAP1 = 2480,
+    FROG_X0 = 3080; // the frog is stranded on the far bank
   L.solids.push(ground(0, 1700), ground(2900, 1900));
   L.solids.push(
     { x: 1700, y: GY, w: GAP0 - 1700, h: 14, oneway: true, k: 'bridge' },
     { x: GAP1, y: GY, w: 2900 - GAP1, h: 14, oneway: true, k: 'bridge' }
   );
   L.solids.push(hill(420, 160, 34), hill(3500, 170, 34));
-  L.solids.push(
-    plat(960, 320, 140, 18, 'log'),
-    plat(3300, 320, 140, 18, 'log'),
-    plat(4000, 320, 140, 18, 'log')
-  );
+  L.solids.push(plat(3300, 320, 140, 18, 'log'), plat(4000, 320, 140, 18, 'log'));
+  // a way over the gap through the branches, so Bella can reach the frog before the bridge exists (the water has crocs)
+  SWAMP_CROSS.forEach(q => L.solids.push(plat(q.x, GY - q.h, q.w, 18, 'log')));
   L.exitX = 4640;
   addGate(L, 'vines');
   L.water.push({ x1: 1700, x2: 2900, y: 478, type: 'croc', respawn: { x: 1640, y: GY } });
@@ -41,7 +46,7 @@ function buildSwamp() {
     anim: null,
     branchSpawned: false,
     plank: false,
-    frogX: 1560,
+    frogX: FROG_X0,
     frogT: 0,
     frogHop: 0,
     frogDone: false,
@@ -61,7 +66,7 @@ function buildSwamp() {
   L.update = function (dt) {
     const b = G.bella;
     L.t += dt;
-    if (!p.spoke && b.x > 1110 && onScreen(p.frogX, GY - 30) && (p.seen = (p.seen || 0) + dt) > 0.9) {
+    if (!p.spoke && b.x > 2850 && onScreen(p.frogX, GY - 30) && (p.seen = (p.seen || 0) + dt) > 0.9) {
       p.spoke = true;
       G.openDialog('Frog', tr('dlg.frog.ask'));
     }
@@ -120,14 +125,14 @@ function buildSwamp() {
     // frog crossing
     if (p.plank && !p.frogDone) {
       p.frogT += dt;
-      p.frogX += 300 * dt;
+      p.frogX -= 300 * dt;
       p.frogHop = Math.abs(Math.sin(p.frogT * 5.2));
-      if (p.frogX >= 2340 && !p.done) {
+      if (p.frogX <= 2340 && !p.done) {
         p.done = true;
         SND.sfx('chirp');
         G.reward(1, 'Frog', tr('dlg.frog.thanks'));
       }
-      if (p.frogX >= 2985) {
+      if (p.frogX <= 1500) {
         p.frogDone = true;
         p.frogHop = 0;
       }
@@ -273,7 +278,7 @@ function buildSwamp() {
     if (p.anim) drawItem(c, 'seed', p.anim.x, p.anim.y, 0.8);
     // frog
     const fy = GY - (p.plank && !p.frogDone ? p.frogHop * 34 : 0);
-    drawFrog(c, p.frogX, fy, { t, dir: 1, hop: p.plank && !p.frogDone ? 1 : 0, sad: !p.plank });
+    drawFrog(c, p.frogX, fy, { t, dir: -1, hop: p.plank && !p.frogDone ? 1 : 0, sad: !p.plank });
     // repaired plank (branch across the gap)
     if (p.plank) {
       c.save();

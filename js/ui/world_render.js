@@ -159,41 +159,6 @@ function drawWorld(c) {
     if (e.drawWarn) e.drawWarn(c, camx);
   });
   drawAtmos(c, L);
-  drawExitCompass(c, L, camx, camy);
-}
-// Alternate world: from high up (on a tower) Bella can see where the way out is. The glow is weaker in the later levels (ALT_PARAMS.hint).
-function drawExitCompass(c, L, camx, camy) {
-  if (!G.alt || G.sub || G.dialog || G.bella.y > ALT_VANTAGE_Y) return;
-  const exit = L.portals.find(p => p.exit);
-  if (!exit) return;
-  const strength = 0.3 + 0.7 * L.P.hint,
-    pulse = 0.75 + 0.25 * Math.sin(G.t * 3),
-    ex = exit.x - camx,
-    ey = exit.y - 50 - camy;
-  c.save();
-  c.globalAlpha = strength * pulse;
-  c.shadowColor = 'rgba(255,214,140,0.9)';
-  c.shadowBlur = 16;
-  c.fillStyle = 'rgba(255,224,160,1)';
-  c.beginPath();
-  if (ex >= 30 && ex <= 930) {
-    // the exit is in view: a golden arrow above it
-    const y = clamp(ey - 70, 40, 480) + Math.sin(G.t * 4) * 5;
-    c.moveTo(ex, y + 26);
-    c.lineTo(ex + 15, y);
-    c.lineTo(ex - 15, y);
-  } else {
-    // out of view: an arrow at the edge of the screen pointing towards it
-    const dir = ex < 30 ? -1 : 1,
-      x = dir < 0 ? 22 : 938,
-      y = clamp(ey, 90, 440);
-    c.moveTo(x + dir * 14, y);
-    c.lineTo(x - dir * 10, y - 17);
-    c.lineTo(x - dir * 10, y + 17);
-  }
-  c.closePath();
-  c.fill();
-  c.restore();
 }
 function drawEndingProps(c) {
   const e = G.end;

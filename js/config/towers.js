@@ -4,13 +4,13 @@
  *   x     centre of the tower (world x)
  *   n     number of ledges below the deck (each is TOWER_STEP higher than the one before)
  *   flip  start the zig-zag on the other side
+ *   style 'stilt' = a wooden walkway on piles: a diagonal flight of steps (dir 1 = steps run off to the right, -1 = to the left)
+ *         leading up to a small deck; no tree trunk. Used in the swamp so it does not look like the forest.
  *   look  (alternate world only) which landmark shape to paint: 'obelisk' | 'arch' | 'crystal'
  * Reach: a normal jump rises about 110 px, so steps of 72 px and gaps of 40 px are comfortable. */
 const TOWER_STEP = 72,
   TOWER_FIRST = 70, // the first ledge is this high above the ground
   TOWER_ARM = 150; // how far the ledges stick out from the middle
-// In the alternate world Bella sees the way out (a glowing arrow) while she is higher than this world y, i.e. on a tower deck
-const ALT_VANTAGE_Y = 100;
 const TOWER_TOP = 380; // how far above y = 0 a level with towers extends (L.top)
 const TOWERS = {
   forest: [
@@ -18,20 +18,13 @@ const TOWERS = {
     { x: 3700, n: 6 }
   ],
   swamp: [
-    { x: 520, n: 7 },
-    { x: 3750, n: 5, flip: true },
-    { x: 4400, n: 6 }
+    { x: 520, n: 7, style: 'stilt', dir: 1 },
+    { x: 3750, n: 5, style: 'stilt', dir: -1 },
+    { x: 4400, n: 6, style: 'stilt', dir: -1 }
   ],
-  mountain: [
-    { x: 1300, n: 7 },
-    { x: 3680, n: 6 }
-  ],
+  mountain: [], // a cliff with long ledges and a slope up to the bear's cave instead (levels/mountain.js)
   village: [{ x: 1250, n: 6 }],
-  alt: [
-    { x: 1640, n: 6, look: 'obelisk' },
-    { x: 3150, n: 7, look: 'arch' },
-    { x: 4450, n: 6, look: 'crystal' }
-  ]
+  alt: [] // the alternate world has long floating platforms instead (ALT_MAPS in levels/alt.js)
 };
 // World y of the deck (top surface) of the tower at world x, so a puzzle object can be put up there
 function towerDeckY(biome, x) {
@@ -46,6 +39,16 @@ function towerWobble(t, i) {
 // The ledges of one tower, bottom to top. The last one is the deck.
 // The ledge just under the deck sticks out past the deck's edge, so Bella can step off the deck and land on it on the way down.
 function towerLedges(t) {
+  if (t.style === 'stilt') {
+    const out = [],
+      dir = t.dir || 1;
+    for (let i = 0; i < t.n; i++) {
+      const off = 160 + 56 * (t.n - 1 - i); // distance from the deck's centre to the near end of this step
+      out.push({ x: dir > 0 ? t.x + off : t.x - off - 100, y: GY - TOWER_FIRST - TOWER_STEP * i, w: 100 });
+    }
+    out.push({ x: t.x - 130, y: GY - TOWER_FIRST - TOWER_STEP * t.n, w: 260, deck: true });
+    return out;
+  }
   const out = [],
     flip = t.flip ? 1 : 0;
   for (let i = 0; i < t.n; i++) {
