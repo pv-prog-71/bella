@@ -16,14 +16,18 @@ function introDur(i) {
 }
 function introNext() {
   const I = G.intro;
+  if (I.done) return; // already starting the game (a second click or key press must not start it twice)
   I.i++;
   I.t = 0;
   if (I.i >= INTRO.length) {
+    I.i = INTRO.length - 1; // the intro is still drawn while the first level loads
+    I.done = true;
     beginPlay(0);
   }
 }
 function introUpdate(dt) {
   const I = G.intro;
+  if (I.done) return;
   I.t += dt;
   if (I.t > introDur(I.i)) introNext();
 }
@@ -60,7 +64,7 @@ function drawIntro(c) {
     y += 10;
     c.globalAlpha = 1;
   }
-  addBtn(W - 130, H - 56, 104, 38, () => beginPlay(0), false);
+  addBtn(W - 130, H - 56, 104, 38, () => { if (!I.done) { I.done = true; beginPlay(0); } }, false);
   pill(c, W - 130, H - 56, 104, 38, 'rgba(255,255,255,0.92)', 10);
   T(c, tr('intro.skip'), W - 78, H - 31, 18, '#222', 'center', 600);
   T(c, tr('intro.continue'), 30, H - 30, 14, 'rgba(255,255,255,0.4)', 'left', 400);

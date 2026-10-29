@@ -24,8 +24,12 @@ function frame(now) {
   const raw = now - lastT,
     dt = Math.min(0.1, raw / 1000);
   lastT = now;
-  stepGame(dt);
-  render();
+  try {
+    stepGame(dt);
+    render();
+  } catch (e) {
+    console.error(e); // one bad frame must never stop the game loop
+  }
   // slow machine: lower the drawing resolution step by step (never raised again, so it does not flicker)
   if (G.state === 'play' && !G.loading && raw < 400) {
     frameMs += (raw - frameMs) * 0.05;

@@ -1,6 +1,6 @@
 /* Alternate World: one reusable level driven by ALT_PARAMS (config/balance.js) */
 const ALT_LAYOUTS = [
-  { exit: 'A', dest: { B: 'A', C: 'A', D: 'A', E: 'A' } },
+  { exit: 'C', dest: { A: 'start', B: 'A', D: 'B', E: 'D' } }, // the first visit: the exit is in the middle of the world, not next to the start
   { exit: 'C', dest: { A: 'start', B: 'A', D: 'B', E: 'D' } },
   { exit: 'D', dest: { A: 'E', B: 'C', C: 'start', E: 'A' } },
   { exit: 'E', dest: { A: 'start', B: 'A', C: 'B', D: 'C' } } // the last one: the way out is at the far end, and the false portals send her back
