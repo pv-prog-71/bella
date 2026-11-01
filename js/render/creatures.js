@@ -165,7 +165,9 @@ function drawShadow(ctx, x, y, o) {
   const t = (o.t || 0) + (o.seed || 0) / 1.6, // every shadow moves at its own moment (the seed is fixed: x changes while it walks and would speed up the legs)
     chase = !!o.lean,
     alert = chase || !!o.alert,
-    sp = chase ? 5.2 : alert ? 1.0 : 0.6, // calm: very slow legs (has not seen Bella); chase: runs
+    step = chase ? 30 : 12, // stride (px)
+    // legs in sync with the real speed (o.speed, px/s), so the feet do not slide on the ground
+    sp = o.speed > 0 ? Math.min(11, (1.57 * o.speed) / step) : alert ? 0.4 : 1.0,
     ph = t * sp,
     sw = Math.sin(ph),
     sway = Math.sin(t * 1.1) * 1.6,
@@ -200,12 +202,16 @@ function drawShadow(ctx, x, y, o) {
   ctx.scale(o.dir || 1, 1);
   ctx.strokeStyle = ctx.fillStyle = '#06080c';
   ctx.lineCap = ctx.lineJoin = 'round';
-  const HIP = -74, step = chase ? 22 : alert ? 10 : 9;
+  const HIP = -74;
   // soft hip joint: hides the corner between the leaning torso and the legs
   ctx.beginPath();
   ctx.arc(0, HIP + 1, 5, 0, Math.PI * 2);
   ctx.fill();
-  // legs: long and thin, a little knee bend
+  // legs: long and thin, a little knee bend; the lower end fades out (no feet)
+  const fade = ctx.createLinearGradient(0, -34, 0, 2);
+  fade.addColorStop(0, '#06080c');
+  fade.addColorStop(1, 'rgba(6,8,12,0)');
+  ctx.fillStyle = fade;
   for (let k = 0; k < 2; k++) {
     const f = k ? -sw : sw,
       fx = f * step,
@@ -214,6 +220,7 @@ function drawShadow(ctx, x, y, o) {
     taper(ctx, [[0, HIP + 1], [kx, HIP / 2 - lift * 0.3], [fx - 2, -lift]], 5, 2.2);
     // no feet: the legs just end, thin and inhuman
   }
+  ctx.fillStyle = '#06080c';
   // upper body, leaning from the hips
   ctx.save();
   ctx.translate(0, HIP);

@@ -120,6 +120,7 @@ function mkShadow(def, P) {
       drawShadow(c, this.x, this.y, {
         t,
         seed: this.x1,
+        speed: this.st === 'chase' ? this.P.chase : this.st === 'patrol' ? this.P.patrol : 0,
         dir: this.dir,
         lean: this.st === 'chase' ? 1 : 0,
         alert: this.st !== 'patrol',
