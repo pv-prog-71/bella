@@ -86,8 +86,7 @@ function buildForest() {
       p.hit = true;
       SND.sfx('rockhit');
       G.say(p.snakeX, GY - 60, tr('bubble.hsss'), 1.6);
-      rock.rest = true;
-      rock.vx = 0;
+      rock.vx = 0; // it keeps falling and lands on the ground by itself
       p.fleeT = 0;
     }
     if (p.hit) {
