@@ -30,7 +30,7 @@ function bellaBuild(img) {
   const bodyFull = mkc(W, H); // body with all four legs, as in the photo: used while she stands still (crisp, no cut edges)
   bodyFull.getContext('2d').drawImage(body, 0, 0);
   // the tail is a separate part (it wags): only the tail itself (a polygon above the back line), not the rump, is cut out of the body
-  const TAILPOLY = [[8, 30], [80, 30], [80, 66], [68, 86], [40, 89], [16, 89], [8, 75]];
+  const TAILPOLY = [[8, 30], [80, 30], [80, 66], [68, 84], [40, 84], [16, 84], [8, 75]];
   const TAILPART = [[8, 30], [80, 30], [80, 66], [68, 86], [70, 93], [28, 95], [20, 91], [8, 75]]; // the moving tail also covers a bit of rump, so it never tears away from the back
   const polyPath = (cx, ox, oy, poly) => { cx.beginPath(); (poly || TAILPOLY).forEach((pt, i) => cx[i ? 'lineTo' : 'moveTo'](q(pt[0]) - ox, q(pt[1]) - oy)); cx.closePath(); };
   [bodyFull.getContext('2d'), b].forEach(cx => { cx.save(); cx.globalCompositeOperation = 'destination-out'; polyPath(cx, 0, 0); cx.fill(); cx.restore(); }); // (no clip(): Safari handles it badly)
