@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Bella's Journey - a 2D platform adventure about a little dog finding her way home.">
   <meta name="theme-color" content="#070b10">
-  <meta name="game-version" content="1.3.26">
+  <meta name="game-version" content="1.3.27">
   <title>Bella's Journey</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.png">
@@ -14,7 +14,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Bella">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1.3.27">
 </head>
 <body>
   <div id="stage">
@@ -25,54 +25,54 @@
 
   <!-- Load order matters: scripts share one global scope (no bundler, no modules, works from file:// and any web host).
        texts -> core -> config -> audio -> rendering -> levels -> game logic -> UI -> input -> main -->
-  <script src="lang/en.js" charset="utf-8"></script>
-  <script src="js/core/i18n.js" charset="utf-8"></script>
-  <script src="js/core/version.js" charset="utf-8"></script>
-  <script src="js/core/constants.js" charset="utf-8"></script>
-  <script src="js/core/util.js" charset="utf-8"></script>
-  <script src="assets/data/manifest.js" charset="utf-8"></script>
-  <script src="js/core/assets.js" charset="utf-8"></script>
-  <script src="assets/data/audio.js" charset="utf-8"></script>
-  <script src="js/config/balance.js" charset="utf-8"></script>
-  <script src="js/config/towers.js" charset="utf-8"></script>
-  <script src="js/config/spells.js" charset="utf-8"></script>
-  <script src="js/audio/audio.js" charset="utf-8"></script>
-  <script src="js/render/palettes.js" charset="utf-8"></script>
-  <script src="js/render/scenery.js" charset="utf-8"></script>
-  <script src="js/render/parallax.js" charset="utf-8"></script>
-  <script src="js/render/bella.js" charset="utf-8"></script>
-  <script src="js/render/creatures.js" charset="utf-8"></script>
-  <script src="js/render/effects.js" charset="utf-8"></script>
-  <script src="js/render/items.js" charset="utf-8"></script>
-  <script src="js/render/icons.js" charset="utf-8"></script>
-  <script src="js/levels/common.js" charset="utf-8"></script>
-  <script src="js/levels/enemies.js" charset="utf-8"></script>
-  <script src="js/levels/decor.js" charset="utf-8"></script>
-  <script src="js/levels/forest.js" charset="utf-8"></script>
-  <script src="js/levels/swamp.js" charset="utf-8"></script>
-  <script src="js/levels/mountain.js" charset="utf-8"></script>
-  <script src="js/levels/village.js" charset="utf-8"></script>
-  <script src="js/levels/alt.js" charset="utf-8"></script>
-  <script src="js/levels/registry.js" charset="utf-8"></script>
-  <script src="js/game/state.js" charset="utf-8"></script>
-  <script src="js/input/state.js" charset="utf-8"></script>
-  <script src="js/game/save.js" charset="utf-8"></script>
-  <script src="js/game/helpers.js" charset="utf-8"></script>
-  <script src="js/game/levelflow.js" charset="utf-8"></script>
-  <script src="js/game/actions.js" charset="utf-8"></script>
-  <script src="js/game/altworld.js" charset="utf-8"></script>
-  <script src="js/game/physics.js" charset="utf-8"></script>
-  <script src="js/game/play.js" charset="utf-8"></script>
-  <script src="js/game/ending.js" charset="utf-8"></script>
-  <script src="js/ui/canvas.js" charset="utf-8"></script>
-  <script src="js/ui/widgets.js" charset="utf-8"></script>
-  <script src="js/ui/world_render.js" charset="utf-8"></script>
-  <script src="js/ui/hud.js" charset="utf-8"></script>
-  <script src="js/ui/screens.js" charset="utf-8"></script>
-  <script src="js/ui/intro.js" charset="utf-8"></script>
-  <script src="js/ui/render.js" charset="utf-8"></script>
-  <script src="js/input/events.js" charset="utf-8"></script>
-  <script src="js/main.js" charset="utf-8"></script>
+  <script src="lang/en.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/core/i18n.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/core/version.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/core/constants.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/core/util.js?v=1.3.27" charset="utf-8"></script>
+  <script src="assets/data/manifest.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/core/assets.js?v=1.3.27" charset="utf-8"></script>
+  <script src="assets/data/audio.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/config/balance.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/config/towers.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/config/spells.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/audio/audio.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/palettes.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/scenery.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/parallax.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/bella.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/creatures.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/effects.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/items.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/render/icons.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/common.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/enemies.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/decor.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/forest.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/swamp.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/mountain.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/village.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/alt.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/levels/registry.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/state.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/input/state.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/save.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/helpers.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/levelflow.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/actions.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/altworld.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/physics.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/play.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/game/ending.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/canvas.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/widgets.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/world_render.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/hud.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/screens.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/intro.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/ui/render.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/input/events.js?v=1.3.27" charset="utf-8"></script>
+  <script src="js/main.js?v=1.3.27" charset="utf-8"></script>
   <script>if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
 </body>
 </html>
