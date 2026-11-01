@@ -131,7 +131,7 @@ function drawHUD(c) {
         'center',
         600
       );
-    T(c, String(i + 1), sx - 20, sy - 14, 11, 'rgba(255,255,255,0.4)', 'center', 600);
+    T(c, String(i + 1), sx - 36, sy - 24, 14, 'rgba(255,255,255,0.75)', 'center', 700);
   }
   // hint text
   if (!alt && !modal && !G.sub && G.hintT > 22 && L.hint) {

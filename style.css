@@ -82,3 +82,12 @@ noscript {
 @supports (height: 100dvh) {
   html, body { height: 100dvh; }
 }
+
+/* phones held upright: ask to rotate (the game is landscape) */
+#rotate { display: none; }
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 700px) {
+  #rotate {
+    display: grid; place-items: center; position: fixed; inset: 0; z-index: 10;
+    background: #070b10; color: #e8f0ee; font: 600 18px/1.4 system-ui, sans-serif; text-align: center; padding: 24px;
+  }
+}

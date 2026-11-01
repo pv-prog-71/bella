@@ -98,6 +98,7 @@ const STRINGS = {
   "death.normal": "Bella is too tired to go on...",
   "toast.spellLearned": "New spell learned: {name}",
   "toast.controls": "← → move   Space jump   E (or click the item box) use item   Esc pause",
+  "toast.touch": "Hold left / right to walk   swipe up to jump   tap Bella to use item",
   "toast.retry": "Bella wakes up and tries again...",
   "toast.noMana": "Not enough mana ({cost} needed)",
   "alt.title": "Find the way back before the time runs out",

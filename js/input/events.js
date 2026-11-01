@@ -35,6 +35,17 @@ cv.addEventListener('pointerdown', e => {
     return;
   }
   if (e.pointerType !== 'mouse' && G.state === 'play' && !G.paused && !G.dialog) {
+    if (!touch.hinted) {
+      touch.hinted = true;
+      toast(tr('toast.touch'), 7);
+    }
+    // tapping Bella (a bit generous for a finger) uses the item she carries, like the E key
+    const bx = G.bella.x - G.cam.x,
+      by = G.bella.y - G.cam.y - 30;
+    if (Math.abs(p.x - bx) < 55 && Math.abs(p.y - by) < 70) {
+      useItem();
+      return;
+    }
     touch.pid = e.pointerId;
     touch.sx = p.x;
     touch.sy = p.y;
