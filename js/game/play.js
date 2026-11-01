@@ -87,16 +87,18 @@ function playUpdate(dt) {
   G.hintT += dt;
   if (G.sinceHurt < 99) G.sinceHurt += dt;
   G.fullToastT -= dt;
-  // Bella standing still with an enemy nearby sometimes barks (not in the alternate world, where she is scared and quiet)
+  // Bella standing still and facing an enemy barks in random bursts (1-3 barks in a row, then a pause); quiet in the alternate world
   G.barkT -= dt;
-  if (b.bark > 0) b.bark = Math.max(0, b.bark - dt * 2.2);
+  if (b.bark > 0) b.bark = Math.max(0, b.bark - dt * 1.7);
   if (G.barkT <= 0) {
     const idle = !G.alt && b.onGround && Math.abs(b.vx) < 20 && !G.sub && !G.dialog && !G.paused,
-      near = idle && L.enemies.some(e => typeof e.x === 'number' && Math.abs(e.x - b.x) < 420 && !e.dead && !e.gone && (!e.box || e.box()));
-    G.barkT = near ? 5 + Math.random() * 5 : 1.5;
-    if (near) {
-      SND.sfx('bella_bark');
-      b.bark = 1; // little head-jerk (see bellaDraw)
+      near = idle && L.enemies.some(e => typeof e.x === 'number' && (e.x - b.x) * b.face > 0 && Math.abs(e.x - b.x) < 480 && !e.dead && !e.gone && (!e.box || e.box()));
+    if (!near) { G.barkQ = 0; G.barkT = 0.5; }
+    else {
+      SND.sfx('bella_bark'); // also opens the mouth (see main.js)
+      if (!(G.barkQ > 0)) G.barkQ = 1 + Math.floor(Math.random() * 3); // new burst: 1-3 barks
+      G.barkQ--;
+      G.barkT = G.barkQ > 0 ? 0.45 + Math.random() * 0.2 : 2.5 + Math.random() * 3.5;
     }
   }
   G.gateToastT -= dt;
