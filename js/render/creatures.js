@@ -165,7 +165,7 @@ function drawShadow(ctx, x, y, o) {
   const t = (o.t || 0) + x / 1.6, // every shadow moves at its own moment
     chase = !!o.lean,
     alert = chase || !!o.alert,
-    sp = chase ? 5.2 : alert ? 1.0 : 0.6, // calm: very slow legs (has not seen Bella); chase: runs
+    sp = chase ? 5.2 : 1.9,
     ph = t * sp,
     sw = Math.sin(ph),
     sway = Math.sin(t * 1.1) * 1.6,
@@ -173,26 +173,8 @@ function drawShadow(ctx, x, y, o) {
   const line = (c, pts, w) => {
     c.lineWidth = w;
     c.beginPath();
-    c.moveTo(pts[0][0], pts[0][1]);
-    if (pts.length === 3) {
-      // a smooth curve through the middle point (no sharp elbows or knees)
-      c.quadraticCurveTo(2 * pts[1][0] - (pts[0][0] + pts[2][0]) / 2, 2 * pts[1][1] - (pts[0][1] + pts[2][1]) / 2, pts[2][0], pts[2][1]);
-    } else pts.slice(1).forEach(pt => c.lineTo(pt[0], pt[1]));
+    pts.forEach((pt, k) => c[k ? 'lineTo' : 'moveTo'](pt[0], pt[1]));
     c.stroke();
-  };
-  // a limb that tapers (thick where it joins the body, thin at the end), so body, neck, arms and legs read as ONE shape
-  const taper = (c, pts, r0, r1) => {
-    c.beginPath();
-    for (let k = 0; k <= 70; k++) {
-      const u = k / 70, m = 1 - u,
-        cx = 2 * pts[1][0] - (pts[0][0] + pts[2][0]) / 2, cy = 2 * pts[1][1] - (pts[0][1] + pts[2][1]) / 2,
-        px = m * m * pts[0][0] + 2 * m * u * cx + u * u * pts[2][0],
-        py = m * m * pts[0][1] + 2 * m * u * cy + u * u * pts[2][1],
-        r = r0 + (r1 - r0) * Math.pow(u, 1.4); // keeps the width near the joint, then thins out smoothly
-      c.moveTo(px + r, py);
-      c.arc(px, py, r, 0, Math.PI * 2);
-    }
-    c.fill();
   };
   ctx.save();
   if (o.alpha != null) ctx.globalAlpha = o.alpha;
@@ -200,38 +182,32 @@ function drawShadow(ctx, x, y, o) {
   ctx.scale(o.dir || 1, 1);
   ctx.strokeStyle = ctx.fillStyle = '#06080c';
   ctx.lineCap = ctx.lineJoin = 'round';
-  const HIP = -74, step = chase ? 22 : alert ? 10 : 9;
-  // soft hip joint: hides the corner between the leaning torso and the legs
-  ctx.beginPath();
-  ctx.arc(0, HIP + 1, 5, 0, Math.PI * 2);
-  ctx.fill();
+  const HIP = -74, step = chase ? 24 : 12;
   // legs: long and thin, a little knee bend
   for (let k = 0; k < 2; k++) {
     const f = k ? -sw : sw,
       fx = f * step,
-      lift = Math.max(0, Math.cos(ph + (k ? Math.PI : 0))) * (chase ? 8 : 4),
+      lift = Math.max(0, Math.cos(ph + (k ? Math.PI : 0))) * (chase ? 9 : 4),
       kx = fx * 0.35 + 3 + (chase ? 5 : 0);
-    taper(ctx, [[0, HIP + 1], [kx, HIP / 2 - lift * 0.3], [fx - 2, -lift]], 5, 2.2);
-    // no feet: the legs just end, thin and inhuman
+    line(ctx, [[0, HIP], [kx, HIP / 2 - lift * 0.3], [fx - 2, -lift]], 4.2);
+    line(ctx, [[fx - 2, -lift], [fx + 9, -lift]], 3.2); // foot
   }
   // upper body, leaning from the hips
   ctx.save();
   ctx.translate(0, HIP);
   ctx.rotate(lean + sway * 0.012);
   const SH = -52; // shoulder height above the hips
-  // torso: a chain of circles along the spine (wide soft shoulders, slim waist, soft hips): no corners at all
-  const rad = u => 3.7 + 0.9 * (1 - u) * (1 - u) + 0.7 * u * u * u, // one soft, continuous taper (u: 0 shoulders .. 1 hips)
-    yAt = u => SH + 4 + u * (-SH - 2);
+  // torso: narrow, tapering to the waist
   ctx.beginPath();
-  for (let k = 0; k <= 20; k++) ctx[k ? 'lineTo' : 'moveTo'](-rad(k / 20), yAt(k / 20));
-  ctx.arc(0, yAt(1), rad(1), Math.PI, 0, true); // rounded hips
-  for (let k = 20; k >= 0; k--) ctx.lineTo(rad(k / 20), yAt(k / 20));
-  ctx.arc(0, yAt(0), rad(0), 0, Math.PI, true); // rounded shoulders
+  ctx.moveTo(-5.2, SH);
+  ctx.quadraticCurveTo(-1.5, SH / 2, -3.2, 3);
+  ctx.lineTo(3.2, 3);
+  ctx.quadraticCurveTo(1.5, SH / 2, 5.2, SH);
   ctx.closePath();
   ctx.fill();
   // neck + head (long, no hair)
   const hx = chase ? 7 : alert ? 3 : 1;
-  taper(ctx, [[0, SH + 5], [hx * 0.3, SH - 2], [hx * 0.6, SH - 11]], 4.2, 2.3);
+  line(ctx, [[0, SH], [hx * 0.6, SH - 10]], 3.4);
   ctx.beginPath();
   ctx.ellipse(hx + 1, SH - 17, 5.2, 8.5, 0.15, 0, Math.PI * 2);
   ctx.fill();
@@ -247,7 +223,7 @@ function drawShadow(ctx, x, y, o) {
   for (let k = 0; k < 2; k++) {
     const side = k ? -1 : 1,
       sh = [side * 3, SH + 4],
-      sw2 = 0; // the arms never swing: they hang still when calm, and stay raised and reaching when it has seen Bella
+      sw2 = Math.sin(ph + (k ? Math.PI : 0));
     let el, hand;
     if (chase) {
       el = [17 + sw2 * 3, SH + 22 + k * 3];
@@ -256,10 +232,10 @@ function drawShadow(ctx, x, y, o) {
       el = [10 + side * 2, SH + 28];
       hand = [24 + k * 6, SH + 52 + Math.sin(t * 2.2 + k) * 3];
     } else {
-      el = [side * 7 + sw2 * 2, SH + 36];
-      hand = [side * 6 + sw2 * 5, SH + 74 + k * 2];
+      el = [side * 4 + sw2 * 3, SH + 36];
+      hand = [side * 2 + sw2 * 6, SH + 74 + k * 2];
     }
-    taper(ctx, [[sh[0] * 0.6, sh[1] + 2], el, hand], 3.6, 1.5);
+    line(ctx, [sh, el, hand], 2.8);
     // three long fingers
     const fl = 11, dx = hand[0] - el[0], dy = hand[1] - el[1], ang = Math.atan2(dy, dx);
     for (let f = -1; f <= 1; f++) {

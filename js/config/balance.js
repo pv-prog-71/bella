@@ -10,10 +10,10 @@ const DMG = { snake: 10, puzzleSnake: 15, spider: 20, wasp: 20, boar: 40, eagle:
 
 /* Alternate World parameters per origin level (shadow speed/damage, countdown in seconds, portal layout). Addendum 3.x */
 const ALT_PARAMS = [
-  { shadows: ['S1', 'S2'], patrol: 19, chase: 95, detect: 200, dmg: 15, time: 80, layout: 0, hint: 1.0 },
+  { shadows: ['S1', 'S2'], patrol: 38, chase: 95, detect: 200, dmg: 15, time: 80, layout: 0, hint: 1.0 },
   {
     shadows: ['S1', 'S2', 'S3', 'S4', 'S7'],
-    patrol: 23,
+    patrol: 46,
     chase: 115,
     detect: 215,
     dmg: 26,
@@ -23,7 +23,7 @@ const ALT_PARAMS = [
   },
   {
     shadows: ['S1', 'S2', 'S3', 'S4', 'S5', 'S7', 'S8'],
-    patrol: 27,
+    patrol: 54,
     chase: 135,
     detect: 235,
     dmg: 38,
@@ -33,7 +33,7 @@ const ALT_PARAMS = [
   },
   {
     shadows: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9'],
-    patrol: 31,
+    patrol: 62,
     chase: 155,
     detect: 255,
     dmg: 50,
