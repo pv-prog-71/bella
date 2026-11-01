@@ -96,9 +96,9 @@ function playUpdate(dt) {
     if (!near) { G.barkQ = 0; G.barkT = 0.5; }
     else {
       SND.sfx('bella_bark'); // also opens the mouth (see main.js)
-      if (!(G.barkQ > 0)) G.barkQ = 1 + Math.floor(Math.random() * 3); // new burst: 1-3 barks
+      if (!(G.barkQ > 0)) G.barkQ = 2 + Math.floor(Math.random() * 4); // new burst: 2-5 barks
       G.barkQ--;
-      G.barkT = G.barkQ > 0 ? 0.45 + Math.random() * 0.2 : 2.5 + Math.random() * 3.5;
+      G.barkT = G.barkQ > 0 ? 0.4 + Math.random() * 0.2 : 1.2 + Math.random() * 2;
     }
   }
   G.gateToastT -= dt;
