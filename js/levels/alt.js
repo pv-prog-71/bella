@@ -96,7 +96,8 @@ function mkShadow(def, P) {
         if (!seen) this.st = 'patrol';
         else if (this.timer <= 0) this.st = 'chase';
       } else if (this.st === 'chase') {
-        if (!seen || !inArea) {
+        // the knock-back of a hit throws Bella up in the air: she must not be lost because of that (vertical limit is wider while chasing)
+        if (!seen || !(b.x > this.x1 - 50 && b.x < this.x2 + 50 && Math.abs(b.y - this.y) < 330)) {
           this.st = 'patrol';
           return;
         }
@@ -118,6 +119,7 @@ function mkShadow(def, P) {
     draw(c, t) {
       drawShadow(c, this.x, this.y, {
         t,
+        seed: this.x1,
         dir: this.dir,
         lean: this.st === 'chase' ? 1 : 0,
         alert: this.st !== 'patrol',

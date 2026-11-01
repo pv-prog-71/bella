@@ -162,7 +162,7 @@ function drawBoy(ctx, x, y, t, scale) {
 // Shadow creature of the alternate world: a tall, thin silhouette with long limbs (drawn with code, no baked sprite).
 // States: patrol (calm), detect (alert: arms rising, pale eyes), chase (alert + leaning forward, arms reaching, long strides).
 function drawShadow(ctx, x, y, o) {
-  const t = (o.t || 0) + x / 1.6, // every shadow moves at its own moment
+  const t = (o.t || 0) + (o.seed || 0) / 1.6, // every shadow moves at its own moment (the seed is fixed: x changes while it walks and would speed up the legs)
     chase = !!o.lean,
     alert = chase || !!o.alert,
     sp = chase ? 5.2 : alert ? 1.0 : 0.6, // calm: very slow legs (has not seen Bella); chase: runs
