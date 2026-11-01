@@ -5,14 +5,20 @@ function drawSpellIcon(c, i, x, y, r, mode, extra) {
   c.translate(x, y);
   const col = SPELLS[i].col,
     locked = mode === 'locked';
+  if (locked) c.globalAlpha = 0.45; // not learned yet: almost invisible
+  if (mode === 'ready') {
+    c.shadowColor = col; // usable now: a soft glow
+    c.shadowBlur = 14;
+  }
   c.fillStyle = locked ? 'rgba(30,34,40,0.8)' : 'rgba(18,24,30,0.9)';
   ell(c, 0, 0, r, r);
   c.fill();
   c.lineWidth = 3.5;
-  c.strokeStyle = locked ? 'rgba(120,130,140,0.5)' : mode === 'active' ? '#fff' : col;
+  c.strokeStyle = locked ? 'rgba(120,130,140,0.5)' : mode === 'active' ? '#fff' : mode === 'nomana' ? col + '88' : col;
   ell(c, 0, 0, r - 2, r - 2);
   c.stroke();
-  c.globalAlpha = locked ? 0.3 : mode === 'nomana' ? 0.45 : 1;
+  c.shadowBlur = 0;
+  c.globalAlpha = locked ? 0.2 : mode === 'nomana' ? 0.5 : 1;
   const glyph = IMG['icons/spell_' + i + (locked ? '_locked' : '')];
   if (glyph) {
     // the glyph PNG is exported at 2x for a button of radius 30

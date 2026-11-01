@@ -47,6 +47,7 @@ function loadLevel(i, opt) {
   G.fx = { invis: 0, jump: 0, resist: 0 };
   releaseExcept(levelGroups(i));
   const L = LEVEL_BUILDERS[i]();
+  fixOrbs(L); // keep mana orbs out of the terrain
   G.L = L;
   if (G.puz[i]) applyDone(L);
   const b = G.bella;

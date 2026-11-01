@@ -35,6 +35,18 @@ function addTowers(L) {
     });
   });
 }
+// Mana orbs are laid out in arcs without looking at the terrain: any orb that ended up inside (or half sunk into) the ground,
+// a hill or a ledge is lifted to hover just above that surface, so it can be picked up while walking or jumping.
+function fixOrbs(L) {
+  for (let pass = 0; pass < 3; pass++) {
+    for (const o of L.orbs) {
+      for (const s of L.solids) {
+        if (s.k === 'gate') continue;
+        if (o.x > s.x - 12 && o.x < s.x + s.w + 12 && o.y > s.y - 30 && o.y < s.y + s.h + 20) o.y = s.y - 38;
+      }
+    }
+  }
+}
 function orbArc(L, x, y, n, spread, h) {
   for (let i = 0; i < n; i++) {
     const u = n === 1 ? 0.5 : i / (n - 1);

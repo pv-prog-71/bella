@@ -138,7 +138,8 @@ function drawHUD(c) {
       sy = 504,
       S = SPELLS[i],
       have = G.spells[i];
-    let mode = !have ? 'locked' : alt ? (G.mana >= S.cost ? 'ready' : 'nomana') : 'ready',
+    // three looks: not learned (almost invisible), learned but not usable now (dimmed, in colour: normal world or too little mana), usable (bright)
+    let mode = !have ? 'locked' : alt && G.mana >= S.cost ? 'ready' : 'nomana',
       ex = null;
     if (alt && have) {
       const k = ['invis', 'jump', 'resist'][i];
@@ -149,17 +150,6 @@ function drawHUD(c) {
     }
     if (!modal && alt && have) addBtn(sx - 30, sy - 30, 60, 60, () => castSpell(i), false);
     drawSpellIcon(c, i, sx, sy, 29, mode, ex);
-    if (have)
-      T(
-        c,
-        String(S.cost),
-        sx,
-        sy + 40,
-        12,
-        mode === 'nomana' ? 'rgba(200,180,180,0.6)' : '#d8e6ff',
-        'center',
-        600
-      );
   }
   // hint text
   if (!alt && !modal && !G.sub && G.hintT > 22 && L.hint) {
