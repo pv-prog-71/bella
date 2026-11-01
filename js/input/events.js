@@ -47,15 +47,6 @@ cv.addEventListener('pointerdown', e => {
     return;
   }
   if (e.pointerType !== 'mouse' && G.state === 'play' && !G.paused && !G.dialog) {
-    if (ui.jumpRect && p.x >= ui.jumpRect.x && p.x <= ui.jumpRect.x + ui.jumpRect.w && p.y >= ui.jumpRect.y && p.y <= ui.jumpRect.y + ui.jumpRect.h) {
-      // on-screen jump button: held = higher jump, a second finger can keep walking
-      touch.jumpHeld = true;
-      touch.jumpPid = e.pointerId;
-      try {
-        cv.setPointerCapture(e.pointerId);
-      } catch (x) {}
-      return;
-    }
     if (!touch.hinted) {
       touch.hinted = true;
       toast(tr('toast.touch'), 7);
@@ -92,10 +83,6 @@ cv.addEventListener('pointermove', e => {
   }
 });
 function endTouch(e) {
-  if (e.pointerId === touch.jumpPid) {
-    touch.jumpHeld = false;
-    touch.jumpPid = null;
-  }
   if (e.pointerId === touch.pid) {
     touch.active = false;
     touch.left = touch.right = false;

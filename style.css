@@ -85,7 +85,7 @@ noscript {
 
 /* phones held upright: ask to rotate (the game is landscape) */
 #rotate { display: none; }
-#rotate svg { width: 84px; height: 84px; animation: rot 2.4s ease-in-out infinite; }
+#rotate svg { width: 84px; height: 84px; max-width: 84px; flex: none; animation: rot 2.4s ease-in-out infinite; transform-origin: 50% 50%; }
 #rotate .sub { color: #8a9a98; font-size: 14px; }
 @keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
 @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
