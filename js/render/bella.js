@@ -30,8 +30,8 @@ function bellaBuild(img) {
   const bodyFull = mkc(W, H); // body with all four legs, as in the photo: used while she stands still (crisp, no cut edges)
   bodyFull.getContext('2d').drawImage(body, 0, 0);
   // the tail is a separate part (it wags): only the tail itself (a polygon above the back line), not the rump, is cut out of the body
-  const TAILPOLY = [[0, 30], [80, 30], [80, 66], [68, 86], [40, 89], [12, 89], [0, 72]];
-  const TAILPART = [[0, 30], [80, 30], [80, 66], [68, 86], [70, 93], [28, 95], [12, 89], [0, 72]]; // the moving tail also covers a bit of rump, so it never tears away from the back
+  const TAILPOLY = [[8, 30], [80, 30], [80, 66], [68, 86], [40, 89], [16, 89], [8, 75]];
+  const TAILPART = [[8, 30], [80, 30], [80, 66], [68, 86], [70, 93], [28, 95], [20, 91], [8, 75]]; // the moving tail also covers a bit of rump, so it never tears away from the back
   const polyPath = (cx, ox, oy, poly) => { cx.beginPath(); (poly || TAILPOLY).forEach((pt, i) => cx[i ? 'lineTo' : 'moveTo'](q(pt[0]) - ox, q(pt[1]) - oy)); cx.closePath(); };
   [bodyFull.getContext('2d'), b].forEach(cx => { cx.save(); cx.globalCompositeOperation = 'destination-out'; polyPath(cx, 0, 0); cx.fill(); cx.restore(); }); // (no clip(): Safari handles it badly)
   // the four legs are drawn separately so they can swing (near pair in front of the body, far pair behind it). They are taken
@@ -53,7 +53,7 @@ function bellaBuild(img) {
   tcx.globalCompositeOperation = 'source-over';
   BELLA.parts = Object.assign({ body, bodyFull, tail }, legs);
   BELLA.piv = {
-    tail: [q(46), q(88)],
+    tail: [q(40), q(90)],
     rfar: [q(72), q(196)],
     rnear: [q(38), q(196)],
     ffar: [q(222), q(196)],
@@ -123,7 +123,7 @@ function bellaDraw(c, x, y, o) {
   }
   const ta = o.scared
     ? -0.35 // scared (alternate world): tail tucked down and still
-    : Math.sin((o.t || 0) * (run ? 15 : 10)) * (run ? 0.24 : 0.3) + (run ? 0.1 : 0.03); // happy and curious: lively wag // tail wags harder, and streams behind when running
+    : Math.sin((o.t || 0) * (run ? 15 : 10)) * (run ? 0.22 : 0.26) + (run ? 0.1 : 0.03); // happy and curious: lively wag // tail wags harder, and streams behind when running
   const part = (p, piv, ang, lift) => {
     tc.save();
     tc.translate(piv[0], piv[1] - (lift || 0));
