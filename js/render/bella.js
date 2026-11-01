@@ -27,16 +27,25 @@ function bellaBuild(img) {
   b.clip();
   b.drawImage(small, 0, 0);
   b.restore();
-  // the legs are drawn separately (so they can swing): take them out of the body, or the swinging copies show next to the originals
-  b.clearRect(q(0), q(212), q(104), H - q(212)); // the upper part of the legs stays in the body, so no gap opens at the belly
-  b.clearRect(q(168), q(212), q(96), H - q(212));
-  BELLA.parts = {
-    body,
-    tail: crop(0, 34, 84, 88),
-    rleg: crop(0, 185, 104, 295),
-    fleg: crop(168, 185, 264, 295)
+  // the four legs are drawn separately so they can swing (near pair in front of the body, far pair behind it). They are taken
+  // out of the body from y=212 down, so no second set of legs shows next to the swinging ones; the upper part stays, no gap opens.
+  const legs = {
+    rfar: crop(58, 188, 94, 258),
+    rnear: crop(0, 188, 58, 295),
+    ffar: crop(212, 190, 250, 252),
+    fnear: crop(184, 190, 250, 295)
   };
-  BELLA.piv = { tail: [q(44), q(84)], rleg: [q(52), q(190)], fleg: [q(206), q(194)] };
+  legs.fnear.c.getContext('2d').clearRect(q(212) - legs.fnear.x, 0, q(40), q(252) - legs.fnear.y); // the far front leg is not part of the near one
+  b.clearRect(q(0), q(212), q(94), H - q(212));
+  b.clearRect(q(184), q(212), q(66), H - q(212));
+  BELLA.parts = Object.assign({ body, tail: crop(0, 34, 84, 88) }, legs);
+  BELLA.piv = {
+    tail: [q(44), q(84)],
+    rfar: [q(72), q(196)],
+    rnear: [q(38), q(196)],
+    ffar: [q(222), q(196)],
+    fnear: [q(200), q(196)]
+  };
   BELLA.tmp = mkc(W + 24, H + 24);
   BELLA.rim = mkc(W + 24, H + 24);
   BELLA.ready = true;
@@ -64,25 +73,22 @@ function bellaDraw(c, x, y, o) {
   const run = o.run,
     ph = o.phase || 0,
     air = o.air || 0;
-  let ra = 0,
-    fa = 0,
-    rl = 0, // how far each pair of legs is lifted off the ground (sprite pixels)
-    fl = 0;
+  // swing angles: positive = foot swings back, negative = forward. Diagonal trot: near rear + far front move together.
+  let A = [0, 0, 0, 0], // rear far, rear near, front far, front near
+    L = [0, 0, 0, 0]; // lift (sprite pixels)
   if (air !== 0) {
-    // in the air: legs stretched back and forward going up, tucked a little when coming down
-    ra = -0.55;
-    fa = 0.5;
-    if (air > 0.3) {
-      ra = -0.25;
-      fa = 0.2;
-    }
-    rl = fl = 5;
+    // jump: legs reach out (front forward, rear back) going up and fold in a little coming down
+    const u = o.vy != null ? clamp(o.vy / 600, -1, 1) : air;
+    const fr = -0.65 + 0.25 * u,
+      rr = 0.6 - 0.3 * u;
+    A = [rr + 0.15, rr - 0.1, fr - 0.15, fr + 0.1];
+    L = [6, 6, 6, 6];
   } else if (run) {
-    // trot: the two pairs of legs swing against each other and lift on the way forward
-    ra = Math.sin(ph) * 0.55;
-    fa = -Math.sin(ph) * 0.55;
-    rl = Math.max(0, Math.cos(ph)) * 7;
-    fl = Math.max(0, -Math.cos(ph)) * 7;
+    const sw = Math.sin(ph) * 0.6,
+      c1 = Math.max(0, Math.cos(ph)) * 8,
+      c2 = Math.max(0, -Math.cos(ph)) * 8;
+    A = [-sw, sw, sw, -sw];
+    L = [c2, c1, c1, c2];
   }
   const ta = Math.sin((o.t || 0) * (run ? 14 : 7)) * (run ? 0.2 : 0.16) + (run ? 0.12 : 0); // tail wags harder, and streams behind when running
   const part = (p, piv, ang, lift) => {
@@ -94,9 +100,11 @@ function bellaDraw(c, x, y, o) {
     tc.restore();
   };
   part(P.tail, V.tail, ta);
-  part(P.rleg, V.rleg, ra, rl);
-  part(P.fleg, V.fleg, fa, fl);
+  part(P.rfar, V.rfar, A[0], L[0]); // far legs behind the body
+  part(P.ffar, V.ffar, A[2], L[2]);
   tc.drawImage(P.body, 0, 0);
+  part(P.rnear, V.rnear, A[1], L[1]); // near legs in front
+  part(P.fnear, V.fnear, A[3], L[3]);
   tc.restore();
   const gl = o.glow || [255, 255, 255, 0.5],
     rim = BELLA.rim,
@@ -120,15 +128,15 @@ function bellaDraw(c, x, y, o) {
     sq = o.squash || 0;
   // whole-body pose: leans into the run, nose up when jumping, nose down when falling, little head-nod while trotting
   let pitch = rn ? 0.05 + Math.sin(ph * 2) * 0.035 : breathe * 0.012;
-  if (air !== 0) pitch = o.vy != null ? clamp(o.vy / 700, -1, 1) * 0.2 : air > 0 ? 0.16 : -0.14; // follows the vertical speed smoothly
+  if (air !== 0) pitch = o.vy != null ? clamp(o.vy / 600, -1, 1) * 0.3 : air > 0 ? 0.16 : -0.14; // follows the vertical speed smoothly
   let sx = 1 + sq * 0.12,
     sy = 1 - sq * 0.12;
   if (rn) {
     sy *= 1 + Math.cos(ph * 2) * 0.025; // stretch and squash with the stride
     sx *= 1 - Math.cos(ph * 2) * 0.02;
   } else if (air !== 0) {
-    sy *= 1.05; // a little taller in the air
-    sx *= 0.96;
+    sy *= 1.06; // taller and slimmer in the air
+    sx *= 0.95;
   } else {
     sy *= 1 + breathe * 0.012;
   }

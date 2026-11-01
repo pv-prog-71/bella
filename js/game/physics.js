@@ -20,6 +20,7 @@ function stepBella(dt) {
     b.coyote = 0;
     b.buf = 0;
     b.jumpTaken = true;
+    b.squash = -1; // stretch on take-off
     SND.sfx('jump');
     if (Math.random() < BARK_ON_JUMP) SND.sfx('bella_bark'); // now and then Bella barks as she jumps
     if (G.fx.jump > 0) spawnSparks(b.x, b.y, '#8fe05a', 10);
@@ -72,7 +73,7 @@ function stepBella(dt) {
     b.squash = 1;
     SND.sfx('land');
   }
-  b.squash = Math.max(0, b.squash - dt * 6);
+  b.squash = b.squash > 0 ? Math.max(0, b.squash - dt * 6) : Math.min(0, b.squash + dt * 5); // landing squash (+) and take-off stretch (-) both fade out
   if (b.onGround && Math.abs(b.vx) > 20) b.phase += dt * (6 + Math.abs(b.vx) * 0.034);
   b.air = b.onGround ? 0 : b.vy < 0 ? -1 : 1;
   if (b.inv > 0) b.inv -= dt;
