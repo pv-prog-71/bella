@@ -20,6 +20,7 @@ function cameraTargetY() {
   return clamp(target, -L.top, 0);
 }
 function toast(text, dur) {
+  if (G.toasts.some(t => t.text === text)) return; // never stack the same message twice
   G.toasts.push({ text, t: 0, dur: dur || 2.8 });
   if (G.toasts.length > 3) G.toasts.shift();
 }

@@ -131,7 +131,6 @@ function drawHUD(c) {
         'center',
         600
       );
-    if (!(COARSE || touch.seen)) T(c, String(i + 1), sx - 36, sy - 24, 14, 'rgba(255,255,255,0.75)', 'center', 700); // key numbers: keyboard only
   }
   // hint text
   if (!alt && !modal && !G.sub && G.hintT > 22 && L.hint) {

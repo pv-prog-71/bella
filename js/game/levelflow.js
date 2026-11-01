@@ -90,6 +90,7 @@ function startNewGame() {
   G.mana = 0;
   G.lvl = 0;
   G.state = 'intro';
+  G.showControls = true;
   G.intro = { i: 0, t: 0 };
   preloadLevel(0); // download the first level while the story is read
   SND.music('title', 2);
@@ -104,7 +105,8 @@ function beginPlay(i, opt) {
     G.fadeTo = 0;
     G.fadeSpd = 0.8;
     G.titleCard = { text: G.L.name, t: 0 };
-    if (i === 0 && !G.puz[0]) toast(tr('toast.controls'), 6);
+    if (G.showControls && i === 0 && !G.puz[0]) toast(tr('toast.controls'), 6); // only after a new game, not on every Continue
+    G.showControls = false;
     setTimeout(() => preloadLevel(i + 1), 4000); // and the next one while this one is played
   });
 }
