@@ -105,7 +105,7 @@ function beginPlay(i, opt) {
     G.fadeTo = 0;
     G.fadeSpd = 0.8;
     G.titleCard = { text: G.L.name, t: 0 };
-    if (G.showControls && i === 0 && !G.puz[0]) toast(tr('toast.controls'), 6); // only after a new game, not on every Continue
+    if (G.showControls && i === 0 && !G.puz[0] && !(COARSE || touch.seen)) toast(tr('toast.controls'), 6); // only after a new game, not on every Continue
     G.showControls = false;
     setTimeout(() => preloadLevel(i + 1), 4000); // and the next one while this one is played
   });

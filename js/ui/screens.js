@@ -110,7 +110,7 @@ function drawTitle(c) {
     );
   } else items.forEach((it, i) => menuBtn(c, it[0], 480, 178 + i * 56, 320, 46, it[1]));
   T(c, tr('title.noFlash'), 640, 512, 14, 'rgba(200,225,215,0.55)', 'center', 400);
-  T(c, tr('title.controls'), 640, 530, 14, 'rgba(200,225,215,0.55)', 'center', 400);
+  T(c, tr(COARSE || touch.seen ? 'title.controlsTouch' : 'title.controls'), 640, 530, 14, 'rgba(200,225,215,0.55)', 'center', 400);
 }
 function drawPanelMenu(c, title, items) {
   c.fillStyle = 'rgba(0,0,6,0.55)';
@@ -155,20 +155,15 @@ function drawPause(c) {
 }
 function drawCredits(c) {
   drawNightBackdrop(c, G.t * 14, 0.45);
-  T(c, tr('credits.title'), 480, 90, 44, '#fff', 'center', 600);
-  const L = [
-    [tr('credits.header'), '#9fd8c8', 22],
-    [tr('credits.design'), '#e8f2ee', 19],
-    [tr('credits.starring'), '#e8f2ee', 19],
-    ['', '', 0],
-    [tr('credits.dedication1'), '#ffe9a0', 19],
-    [tr('credits.dedication2'), '#ffe9a0', 19],
-    ['', '', 0],
-    [tr('credits.noFlash'), '#b8cdc6', 16]
-  ];
-  L.forEach((l, i) => {
-    if (l[0]) T(c, l[0], 480, 150 + i * 34, l[2], l[1], 'center', 500);
-  });
+  T(c, tr('credits.title'), 480, 80, 44, '#fff', 'center', 600);
+  T(c, tr('credits.header'), 480, 138, 22, '#9fd8c8', 'center', 500);
+  T(c, tr('credits.dedication1'), 480, 178, 19, '#ffe9a0', 'center', 500);
+  T(c, tr('credits.dedication2'), 480, 210, 19, '#ffe9a0', 'center', 500);
+  // how to play: keyboard keys on desktop, touch gestures on phones and tablets
+  T(c, tr('credits.controls'), 480, 262, 20, '#9fd8c8', 'center', 600);
+  const keys = COARSE || touch.seen ? ['credits.t1', 'credits.t2', 'credits.t3', 'credits.t4', 'credits.t5'] : ['menu.k1', 'menu.k2', 'menu.k3', 'menu.k4', 'menu.k5'];
+  keys.forEach((k, i) => T(c, tr(k), 480, 294 + i * 25, 16, '#e8f2ee', 'center', 500));
+  T(c, tr('credits.noFlash'), 480, 440, 15, '#b8cdc6', 'center', 500);
   menuBtn(c, tr('menu.back'), 380, 468, 200, 46, () => {
     G.state = 'title';
     ui.focus = 0;
