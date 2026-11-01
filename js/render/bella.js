@@ -87,10 +87,13 @@ function bellaDraw(c, x, y, o) {
     const sw = Math.sin(ph) * 0.6,
       c1 = Math.max(0, Math.cos(ph)) * 8,
       c2 = Math.max(0, -Math.cos(ph)) * 8;
-    A = [-sw, sw, sw, -sw];
+    const k = o.scared ? 0.6 : 1; // scared: shorter, more hesitant steps
+    A = [-sw * k, sw * k, sw * k, -sw * k];
     L = [c2, c1, c1, c2];
   }
-  const ta = Math.sin((o.t || 0) * (run ? 14 : 7)) * (run ? 0.2 : 0.16) + (run ? 0.12 : 0); // tail wags harder, and streams behind when running
+  const ta = o.scared
+    ? Math.sin((o.t || 0) * 9) * 0.05 - 0.35 // scared: tail tucked down, barely wagging
+    : Math.sin((o.t || 0) * (run ? 14 : 7)) * (run ? 0.2 : 0.16) + (run ? 0.12 : 0); // tail wags harder, and streams behind when running
   const part = (p, piv, ang, lift) => {
     tc.save();
     tc.translate(piv[0], piv[1] - (lift || 0));
@@ -123,11 +126,13 @@ function bellaDraw(c, x, y, o) {
   rc.fillRect(0, 0, rw, rh);
   c.save();
   const rn = run && air === 0,
-    bob = rn ? -Math.abs(Math.sin(ph)) * 6 : 0, // bounce with every stride
+    bob = rn ? -Math.abs(Math.sin(ph)) * (o.scared ? 3 : 6) : 0, // bounce with every stride (smaller when scared)
     breathe = !run && air === 0 ? Math.sin((o.t || 0) * 2.4) : 0, // idle: slow breathing
     sq = o.squash || 0;
   // whole-body pose: leans into the run, nose up when jumping, nose down when falling, little head-nod while trotting
   let pitch = rn ? 0.05 + Math.sin(ph * 2) * 0.035 : breathe * 0.012;
+  if (o.scared) pitch += 0.09; // alternate world: head low, hunched, careful
+  if (o.bark) pitch -= Math.sin(o.bark * Math.PI) * 0.16; // bark: the head jerks up and back
   if (air !== 0) pitch = o.vy != null ? clamp(o.vy / 600, -1, 1) * 0.3 : air > 0 ? 0.16 : -0.14; // follows the vertical speed smoothly
   let sx = 1 + sq * 0.12,
     sy = 1 - sq * 0.12;

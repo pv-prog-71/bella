@@ -51,6 +51,7 @@ const G = {
   titleCard: null,
   portalCool: 0,
   fullToastT: 0,
+  barkT: 6, // seconds until Bella may bark at a nearby enemy while standing still
   gateToastT: 0,
   end: null,
   lastSafe: null,
