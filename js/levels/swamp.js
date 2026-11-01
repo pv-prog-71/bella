@@ -181,7 +181,9 @@ function buildSwamp() {
         // seeds only help the bird: a line of text, no arrow
         if (G.held && G.held.type === 'seed')
           return { x: BIRD.x, y: BIRD.y - 70, text: tr('hint.swamp.seed'), noArrow: true };
-        return { x: POD_X, y: POD_Y - 80, text: tr('hint.swamp.pods'), noArrow: true };
+        // "this plant" only makes sense when the plant is on screen; from far away say where to find it
+        const near = Math.abs(b.x - POD_X) < 450;
+        return { x: POD_X, y: POD_Y - 80, text: tr(near ? 'hint.swamp.pods' : 'hint.swamp.podsFar'), noArrow: true };
       }
       if (p.bird === 'creak' || p.bird === 'fly') {
         const br = L.items.find(i => i.type === 'branch');

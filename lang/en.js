@@ -138,6 +138,7 @@ const STRINGS = {
   "hint.forest.climb": "From the high ledge above the snake you could do something. Climb up!",
   "hint.forest.rock": "From up here you could drop something on the snake. Something heavy would scare it away.",
   "hint.swamp.seed": "The bird likes seeds. Use the item near its tree. (E or click the item)",
+  "hint.swamp.podsFar": "The bird likes seeds. The seed plant grows on top of the first big tree, back to the left.",
   "hint.swamp.pods": "The bird seems to like the seeds of this plant. It needs a few!",
   "hint.swamp.branch": "Use the branch at the missing plank. (E or click the item)",
   "hint.swamp.branchFound": "The branch broke! It could repair the bridge.",
