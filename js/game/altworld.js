@@ -7,6 +7,7 @@ function startSeizure() {
   G.bella.vx = 0;
   G.held && (G.held.state = 'held');
   SND.music('alt', 7.5);
+  preloadLevel(G.lvl + 1); // the slow seizure is a good moment to fetch the next level
 }
 function enterAlt() {
   const L = G.L;

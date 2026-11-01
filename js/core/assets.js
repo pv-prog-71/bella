@@ -49,6 +49,12 @@ function ensureAssets(groups, then) {
       G.loading.err = String(e.message || e);
     });
 }
+// Quietly download a level's images in the background (no loading screen), so that starting it later is instant.
+function preloadLevel(i) {
+  if (i < 0 || i >= LEVEL_BIOMES.length) return;
+  const names = groupNames(levelGroups(i)).filter(n => !IMG[n]);
+  if (names.length) loadImages(names).catch(() => {}); // a failure here is harmless: beginPlay loads again with its own error screen
+}
 // the title-screen backdrop ('night') is dropped while playing and reloaded when the title shows again
 let nightLoading = false;
 function ensureNight() {

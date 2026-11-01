@@ -148,6 +148,10 @@ function drawPause(c) {
       }
     ]
   ]);
+  if (!(COARSE || touch.seen)) {
+    // keyboard shortcuts, shown under the pause menu (desktop only)
+    ['menu.k1', 'menu.k2', 'menu.k3', 'menu.k4'].forEach((k, i) => T(c, tr(k), 480, 400 + i * 24, 16, 'rgba(225,240,235,0.85)', 'center', 500));
+  }
 }
 function drawCredits(c) {
   drawNightBackdrop(c, G.t * 14, 0.45);

@@ -91,6 +91,7 @@ function startNewGame() {
   G.lvl = 0;
   G.state = 'intro';
   G.intro = { i: 0, t: 0 };
+  preloadLevel(0); // download the first level while the story is read
   SND.music('title', 2);
 }
 function beginPlay(i, opt) {
@@ -104,6 +105,7 @@ function beginPlay(i, opt) {
     G.fadeSpd = 0.8;
     G.titleCard = { text: G.L.name, t: 0 };
     if (i === 0 && !G.puz[0]) toast(tr('toast.controls'), 6);
+    setTimeout(() => preloadLevel(i + 1), 4000); // and the next one while this one is played
   });
 }
 function continueGame() {
@@ -122,4 +124,5 @@ function changeLevel(next) {
   G.fadeTo = 1;
   G.fadeSpd = 0.9;
   G.nextLvl = next;
+  preloadLevel(next); // the fade-out gives the download a head start
 }
