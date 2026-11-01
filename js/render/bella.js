@@ -29,6 +29,8 @@ function bellaBuild(img) {
   b.restore();
   const bodyFull = mkc(W, H); // body with all four legs, as in the photo: used while she stands still (crisp, no cut edges)
   bodyFull.getContext('2d').drawImage(body, 0, 0);
+  bodyFull.getContext('2d').clearRect(0, 0, q(84), q(88)); // the tail is a separate part (it wags), so it is removed from the body
+  b.clearRect(0, 0, q(84), q(88));
   // the four legs are drawn separately so they can swing (near pair in front of the body, far pair behind it). They are taken
   // out of the body from y=212 down, so no second set of legs shows next to the swinging ones; the upper part stays, no gap opens.
   const legs = {
@@ -122,7 +124,6 @@ function bellaDraw(c, x, y, o) {
     tc.restore();
   };
   const open = o.bark > 0;
-  part(P.tail, V.tail, ta);
   if (air === 0 && !run) {
     // standing: the photo as it is (all four legs in the body), only the tail moves and the mouth opens when she barks
     tc.drawImage(open && BELLA.bodyBarkFull ? BELLA.bodyBarkFull : P.bodyFull, 0, 0);
@@ -133,6 +134,7 @@ function bellaDraw(c, x, y, o) {
     part(P.rnear, V.rnear, A[1], L[1]); // near legs in front
     part(P.fnear, V.fnear, A[3], L[3]);
   }
+  part(P.tail, V.tail, ta); // tail on top of the rump, so no gap shows when it swings
   tc.restore();
   const gl = o.glow || [255, 255, 255, 0.5],
     rim = BELLA.rim,
@@ -142,8 +144,8 @@ function bellaDraw(c, x, y, o) {
     rh = rim.height;
   rc.globalCompositeOperation = 'source-over';
   rc.clearRect(0, 0, rw, rh);
-  for (let k = 0; k < 6; k++) {
-    const a = (k / 6) * TAU;
+  for (let k = 0; k < 12; k++) {
+    const a = (k / 12) * TAU;
     rc.drawImage(t, Math.cos(a) * d, Math.sin(a) * d);
   }
   rc.globalCompositeOperation = 'source-in';

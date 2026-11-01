@@ -39,7 +39,7 @@ function drawTitle(c) {
   c.fillStyle = 'rgba(0,0,0,0.3)';
   ell(c, bx, 478, 90, 12);
   c.fill();
-  bellaDraw(c, bx, 476, { face: 1, t: G.t, scale: 1.8, glow: [200, 235, 255, 0.5], rim: 5 });
+  bellaDraw(c, bx, 476, { face: 1, t: G.t, scale: 1.8, glow: [200, 235, 255, 0.5], rim: 3 });
   c.save();
   c.shadowColor = 'rgba(143,216,192,0.6)';
   c.shadowBlur = 24;
@@ -180,7 +180,7 @@ function drawBye(c) {
 }
 function drawEndCard(c) {
   drawNightBackdrop(c, 600 + G.t * 6, 0.15);
-  bellaDraw(c, 480, 470, { face: 1, t: G.t, scale: 1.5, glow: [255, 235, 190, 0.55], rim: 5 });
+  bellaDraw(c, 480, 470, { face: 1, t: G.t, scale: 1.5, glow: [255, 235, 190, 0.55], rim: 3 });
   c.save();
   c.shadowColor = 'rgba(255,220,160,0.6)';
   c.shadowBlur = 24;
