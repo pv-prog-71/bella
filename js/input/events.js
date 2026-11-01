@@ -8,10 +8,6 @@ function toLogical(e) {
   const r = cv.getBoundingClientRect();
   return { x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H };
 }
-function setTouchDir(x) {
-  touch.left = x < W / 2;
-  touch.right = !touch.left;
-}
 cv.addEventListener('pointerdown', e => {
   ensureAudio();
   if (e.pointerType !== 'mouse') {
@@ -51,6 +47,19 @@ cv.addEventListener('pointerdown', e => {
       touch.hinted = true;
       toast(tr('toast.touch'), 7);
     }
+    // on-screen buttons: arrows, jump, use (each finger keeps its own button, so walking and jumping work together)
+    const tb = touchBtnAt(p);
+    if (tb) {
+      touch.pids[e.pointerId] = tb;
+      if (tb === 'left') touch.left = true;
+      else if (tb === 'right') touch.right = true;
+      else if (tb === 'jump') ((touch.jump = true), (touch.jumpHeld = true));
+      else if (tb === 'use') useItem();
+      try {
+        cv.setPointerCapture(e.pointerId);
+      } catch (x) {}
+      return;
+    }
     // tapping Bella (a bit generous for a finger) uses the item she carries, like the E key
     const bx = G.bella.x - G.cam.x,
       by = G.bella.y - G.cam.y - 30;
@@ -58,14 +67,6 @@ cv.addEventListener('pointerdown', e => {
       useItem();
       return;
     }
-    touch.pid = e.pointerId;
-    touch.sx = p.x;
-    touch.sy = p.y;
-    touch.active = true;
-    setTouchDir(p.x);
-    try {
-      cv.setPointerCapture(e.pointerId);
-    } catch (x) {}
   }
 });
 cv.addEventListener('pointermove', e => {
@@ -73,20 +74,22 @@ cv.addEventListener('pointermove', e => {
   mouse.x = p.x;
   mouse.y = p.y;
   mouse.moved = true;
-  if (touch.active && e.pointerId === touch.pid) {
-    setTouchDir(p.x);
-    if (touch.sy - p.y > 45) {
-      touch.jump = true;
-      touch.jumpUntil = performance.now() + 260; // keep the jump 'held' a moment so a swipe gives a full jump, not a hop
-      touch.sy = p.y;
-    }
+  const k = touch.pids[e.pointerId];
+  if (k === 'left' || k === 'right') {
+    // sliding from one arrow to the other changes direction without lifting the finger
+    const n = touchBtnAt(p, ['left', 'right']);
+    touch.left = n === 'left';
+    touch.right = n === 'right';
+    touch.pids[e.pointerId] = n || k;
   }
 });
 function endTouch(e) {
-  if (e.pointerId === touch.pid) {
-    touch.active = false;
-    touch.left = touch.right = false;
-    touch.pid = null;
+  const k = touch.pids[e.pointerId];
+  if (k) {
+    if (k === 'left') touch.left = false;
+    else if (k === 'right') touch.right = false;
+    else if (k === 'jump') touch.jumpHeld = false;
+    delete touch.pids[e.pointerId];
   }
   mouse.down = false;
 }
@@ -173,7 +176,8 @@ window.addEventListener('keyup', e => {
 });
 window.addEventListener('blur', () => {
   for (const k in keys) keys[k] = false;
-  touch.left = touch.right = false;
+  touch.left = touch.right = touch.jumpHeld = false;
+  touch.pids = {};
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && G.state === 'play' && !G.sub) {

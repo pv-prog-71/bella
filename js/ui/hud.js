@@ -34,6 +34,35 @@ function drawHUD(c) {
     hf > 0.5 ? '#6adf6a' : hf > 0.25 ? '#e8c84a' : '#e85a4a',
     hf > 0.5 ? '#b8f060' : hf > 0.25 ? '#f0e070' : '#f08a5a'
   );
+  // on-screen touch buttons: arrows (bottom left), jump and use (bottom right)
+  if ((COARSE || touch.seen) && !modal && !G.sub && G.state === 'play') {
+    const on = { left: touch.left, right: touch.right, jump: touch.jumpHeld, use: false };
+    c.save();
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    for (const k in TBTN) {
+      if (k === 'use' && alt) continue;
+      const b = TBTN[k];
+      c.globalAlpha = on[k] ? 0.85 : 0.5;
+      c.fillStyle = 'rgba(10,14,18,0.75)';
+      c.beginPath();
+      c.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      c.fill();
+      c.lineWidth = 3;
+      c.strokeStyle = on[k] ? '#8fd8c0' : '#e8f0ee';
+      c.stroke();
+      c.strokeStyle = '#e8f0ee';
+      c.lineWidth = 6;
+      c.beginPath();
+      const s = k === 'jump' ? 17 : 12;
+      if (k === 'left') (c.moveTo(b.x + 6, b.y - s), c.lineTo(b.x - 8, b.y), c.lineTo(b.x + 6, b.y + s));
+      else if (k === 'right') (c.moveTo(b.x - 6, b.y - s), c.lineTo(b.x + 8, b.y), c.lineTo(b.x - 6, b.y + s));
+      else if (k === 'jump') (c.moveTo(b.x - s, b.y + 7), c.lineTo(b.x, b.y - 10), c.lineTo(b.x + s, b.y + 7));
+      if (k !== 'use') c.stroke();
+      else T(c, tr('touch.use'), b.x, b.y + 1, 15, '#e8f0ee', 'center', 700);
+    }
+    c.restore();
+  }
   // menu button
   if (!modal)
     addBtn(
