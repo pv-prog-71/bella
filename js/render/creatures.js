@@ -159,9 +159,90 @@ function drawBoy(ctx, x, y, t, scale) {
   drawClip(ctx, 'boy', x, y, t, { scale: scale || 1 });
 }
 
-// Shadow creature of the alternate world. States: patrol (calm), detect (alert), chase (alert + leaning).
+// Shadow creature of the alternate world: a tall, thin silhouette with long limbs (drawn with code, no baked sprite).
+// States: patrol (calm), detect (alert: arms rising, pale eyes), chase (alert + leaning forward, arms reaching, long strides).
 function drawShadow(ctx, x, y, o) {
-  const clipName = o.lean ? 'shadow_chase' : o.alert ? 'shadow_alert' : 'shadow_calm',
-    sway = x / 1.6;   // every shadow sways at its own moment
-  drawClip(ctx, clipName, x, y, (o.t || 0) + sway, { dir: o.dir, alpha: o.alpha });
+  const t = (o.t || 0) + x / 1.6, // every shadow moves at its own moment
+    chase = !!o.lean,
+    alert = chase || !!o.alert,
+    sp = chase ? 5.2 : 1.9,
+    ph = t * sp,
+    sw = Math.sin(ph),
+    sway = Math.sin(t * 1.1) * 1.6,
+    lean = chase ? 0.3 : alert ? 0.07 : 0.0;
+  const line = (c, pts, w) => {
+    c.lineWidth = w;
+    c.beginPath();
+    pts.forEach((pt, k) => c[k ? 'lineTo' : 'moveTo'](pt[0], pt[1]));
+    c.stroke();
+  };
+  ctx.save();
+  if (o.alpha != null) ctx.globalAlpha = o.alpha;
+  ctx.translate(x, y);
+  ctx.scale(o.dir || 1, 1);
+  ctx.strokeStyle = ctx.fillStyle = '#06080c';
+  ctx.lineCap = ctx.lineJoin = 'round';
+  const HIP = -74, step = chase ? 24 : 12;
+  // legs: long and thin, a little knee bend
+  for (let k = 0; k < 2; k++) {
+    const f = k ? -sw : sw,
+      fx = f * step,
+      lift = Math.max(0, Math.cos(ph + (k ? Math.PI : 0))) * (chase ? 9 : 4),
+      kx = fx * 0.35 + 3 + (chase ? 5 : 0);
+    line(ctx, [[0, HIP], [kx, HIP / 2 - lift * 0.3], [fx - 2, -lift]], 4.2);
+    line(ctx, [[fx - 2, -lift], [fx + 9, -lift]], 3.2); // foot
+  }
+  // upper body, leaning from the hips
+  ctx.save();
+  ctx.translate(0, HIP);
+  ctx.rotate(lean + sway * 0.012);
+  const SH = -52; // shoulder height above the hips
+  // torso: narrow, tapering to the waist
+  ctx.beginPath();
+  ctx.moveTo(-5.2, SH);
+  ctx.quadraticCurveTo(-1.5, SH / 2, -3.2, 3);
+  ctx.lineTo(3.2, 3);
+  ctx.quadraticCurveTo(1.5, SH / 2, 5.2, SH);
+  ctx.closePath();
+  ctx.fill();
+  // neck + head (long, no hair)
+  const hx = chase ? 7 : alert ? 3 : 1;
+  line(ctx, [[0, SH], [hx * 0.6, SH - 10]], 3.4);
+  ctx.beginPath();
+  ctx.ellipse(hx + 1, SH - 17, 5.2, 8.5, 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  if (alert) {
+    ctx.fillStyle = 'rgba(210,235,255,0.85)';
+    ctx.beginPath();
+    ctx.arc(hx + 3.2, SH - 18, 1.3, 0, Math.PI * 2);
+    ctx.arc(hx + 0.2, SH - 18, 1.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#06080c';
+  }
+  // arms: very long; hanging when calm, raised when alert, reaching forward when chasing
+  for (let k = 0; k < 2; k++) {
+    const side = k ? -1 : 1,
+      sh = [side * 3, SH + 4],
+      sw2 = Math.sin(ph + (k ? Math.PI : 0));
+    let el, hand;
+    if (chase) {
+      el = [17 + sw2 * 3, SH + 22 + k * 3];
+      hand = [42 + sw2 * 4, SH + 40 + k * 5 - sw2 * 3];
+    } else if (alert) {
+      el = [10 + side * 2, SH + 28];
+      hand = [24 + k * 6, SH + 52 + Math.sin(t * 2.2 + k) * 3];
+    } else {
+      el = [side * 4 + sw2 * 3, SH + 36];
+      hand = [side * 2 + sw2 * 6, SH + 74 + k * 2];
+    }
+    line(ctx, [sh, el, hand], 2.8);
+    // three long fingers
+    const fl = 11, dx = hand[0] - el[0], dy = hand[1] - el[1], ang = Math.atan2(dy, dx);
+    for (let f = -1; f <= 1; f++) {
+      const a = ang + f * 0.28;
+      line(ctx, [hand, [hand[0] + Math.cos(a) * fl, hand[1] + Math.sin(a) * fl]], 1.6);
+    }
+  }
+  ctx.restore();
+  ctx.restore();
 }

@@ -92,7 +92,15 @@ function playUpdate(dt) {
   if (b.bark > 0) b.bark = Math.max(0, b.bark - dt * 1.7);
   if (G.barkT <= 0) {
     const idle = !G.alt && b.onGround && Math.abs(b.vx) < 20 && !G.sub && !G.dialog && !G.paused,
-      near = idle && L.enemies.some(e => typeof e.x === 'number' && (e.x - b.x) * b.face > 0 && Math.abs(e.x - b.x) < 200 && !e.dead && !e.gone && (!e.box || e.box()));
+      near =
+        idle &&
+        L.enemies.some(e => {
+          if (typeof e.x !== 'number' || e.dead || e.gone || (e.box && !e.box())) return false;
+          if ((e.x - b.x) * b.face <= 0 || Math.abs(e.x - b.x) >= 200) return false; // in front of her, close
+          const bx = e.box && e.box(),
+            ey = bx ? bx.y + bx.h / 2 : typeof e.y === 'number' ? e.y - 20 : b.y - 30;
+          return Math.abs(ey - (b.y - 30)) < 100; // and at her height (not a spider hanging high up)
+        });
     if (!near) { G.barkQ = 0; G.barkT = 0.5; }
     else {
       SND.sfx('bella_bark'); // also opens the mouth (see main.js)
