@@ -86,6 +86,7 @@ cv.addEventListener('pointermove', e => {
     setTouchDir(p.x);
     if (touch.sy - p.y > 45) {
       touch.jump = true;
+      touch.jumpUntil = performance.now() + 260; // keep the jump 'held' a moment so a swipe gives a full jump, not a hop
       touch.sy = p.y;
     }
   }
