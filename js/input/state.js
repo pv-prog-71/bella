@@ -6,10 +6,10 @@ const keys = {},
   touch = { left: false, right: false, jump: false, jumpHeld: false, seen: false, fs: false, hinted: false, pids: {} };
 // on-screen touch buttons (logical 960x540 coordinates): arrows bottom left, jump and use bottom right
 const TBTN = {
-  left: { x: 66, y: 404, r: 46 },
-  right: { x: 176, y: 404, r: 46 },
-  jump: { x: 888, y: 398, r: 54 },
-  use: { x: 776, y: 426, r: 38 }
+  left: { x: 76, y: 400, r: 55 },
+  right: { x: 198, y: 400, r: 55 },
+  jump: { x: 888, y: 400, r: 54 },
+  use: { x: 772, y: 400, r: 44 }
 };
 function touchBtnAt(p, only) {
   let best = null,

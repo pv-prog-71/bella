@@ -54,12 +54,12 @@ function drawHUD(c) {
       c.strokeStyle = '#e8f0ee';
       c.lineWidth = 6;
       c.beginPath();
-      const s = k === 'jump' ? 17 : 12;
+      const s = k === 'jump' ? 17 : 14;
       if (k === 'left') (c.moveTo(b.x + 6, b.y - s), c.lineTo(b.x - 8, b.y), c.lineTo(b.x + 6, b.y + s));
       else if (k === 'right') (c.moveTo(b.x - 6, b.y - s), c.lineTo(b.x + 8, b.y), c.lineTo(b.x - 6, b.y + s));
       else if (k === 'jump') (c.moveTo(b.x - s, b.y + 7), c.lineTo(b.x, b.y - 10), c.lineTo(b.x + s, b.y + 7));
       if (k !== 'use') c.stroke();
-      else T(c, tr('touch.use'), b.x, b.y + 1, 15, '#e8f0ee', 'center', 700);
+      else T(c, tr('touch.use'), b.x, b.y + 8, 22, '#e8f0ee', 'center', 700);
     }
     c.restore();
   }
