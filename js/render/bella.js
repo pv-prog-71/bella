@@ -27,6 +27,9 @@ function bellaBuild(img) {
   b.clip();
   b.drawImage(small, 0, 0);
   b.restore();
+  // the legs are drawn separately (so they can swing): take them out of the body, or the swinging copies show next to the originals
+  b.clearRect(q(0), q(212), q(104), H - q(212)); // the upper part of the legs stays in the body, so no gap opens at the belly
+  b.clearRect(q(168), q(212), q(96), H - q(212));
   BELLA.parts = {
     body,
     tail: crop(0, 34, 84, 88),
@@ -62,30 +65,37 @@ function bellaDraw(c, x, y, o) {
     ph = o.phase || 0,
     air = o.air || 0;
   let ra = 0,
-    fa = 0;
+    fa = 0,
+    rl = 0, // how far each pair of legs is lifted off the ground (sprite pixels)
+    fl = 0;
   if (air !== 0) {
-    ra = -0.42;
-    fa = 0.38;
+    // in the air: legs stretched back and forward going up, tucked a little when coming down
+    ra = -0.55;
+    fa = 0.5;
     if (air > 0.3) {
-      ra = -0.2;
-      fa = 0.15;
+      ra = -0.25;
+      fa = 0.2;
     }
+    rl = fl = 5;
   } else if (run) {
-    ra = Math.sin(ph) * 0.42;
-    fa = -Math.sin(ph) * 0.42;
+    // trot: the two pairs of legs swing against each other and lift on the way forward
+    ra = Math.sin(ph) * 0.55;
+    fa = -Math.sin(ph) * 0.55;
+    rl = Math.max(0, Math.cos(ph)) * 7;
+    fl = Math.max(0, -Math.cos(ph)) * 7;
   }
-  const ta = Math.sin((o.t || 0) * (run ? 12 : 7)) * (run ? 0.09 : 0.14);
-  const part = (p, piv, ang) => {
+  const ta = Math.sin((o.t || 0) * (run ? 14 : 7)) * (run ? 0.2 : 0.16) + (run ? 0.12 : 0); // tail wags harder, and streams behind when running
+  const part = (p, piv, ang, lift) => {
     tc.save();
-    tc.translate(piv[0], piv[1]);
+    tc.translate(piv[0], piv[1] - (lift || 0));
     tc.rotate(ang);
     tc.translate(-piv[0], -piv[1]);
     tc.drawImage(p.c, p.x, p.y);
     tc.restore();
   };
   part(P.tail, V.tail, ta);
-  part(P.rleg, V.rleg, ra);
-  part(P.fleg, V.fleg, fa);
+  part(P.rleg, V.rleg, ra, rl);
+  part(P.fleg, V.fleg, fa, fl);
   tc.drawImage(P.body, 0, 0);
   tc.restore();
   const gl = o.glow || [255, 255, 255, 0.5],
@@ -104,10 +114,27 @@ function bellaDraw(c, x, y, o) {
   rc.fillStyle = `rgba(${gl[0]},${gl[1]},${gl[2]},${gl[3]})`;
   rc.fillRect(0, 0, rw, rh);
   c.save();
-  const bob = run && air === 0 ? -Math.abs(Math.sin(ph)) * 3.5 : 0,
+  const rn = run && air === 0,
+    bob = rn ? -Math.abs(Math.sin(ph)) * 6 : 0, // bounce with every stride
+    breathe = !run && air === 0 ? Math.sin((o.t || 0) * 2.4) : 0, // idle: slow breathing
     sq = o.squash || 0;
+  // whole-body pose: leans into the run, nose up when jumping, nose down when falling, little head-nod while trotting
+  let pitch = rn ? 0.05 + Math.sin(ph * 2) * 0.035 : breathe * 0.012;
+  if (air !== 0) pitch = o.vy != null ? clamp(o.vy / 700, -1, 1) * 0.2 : air > 0 ? 0.16 : -0.14; // follows the vertical speed smoothly
+  let sx = 1 + sq * 0.12,
+    sy = 1 - sq * 0.12;
+  if (rn) {
+    sy *= 1 + Math.cos(ph * 2) * 0.025; // stretch and squash with the stride
+    sx *= 1 - Math.cos(ph * 2) * 0.02;
+  } else if (air !== 0) {
+    sy *= 1.05; // a little taller in the air
+    sx *= 0.96;
+  } else {
+    sy *= 1 + breathe * 0.012;
+  }
   c.translate(x + (o.tremble ? Math.sin((o.t || 0) * 40) * 1.4 : 0), y + bob);
-  c.scale(face * s * (1 + sq * 0.12), s * (1 - sq * 0.12));
+  c.rotate(face * pitch);
+  c.scale(face * s * sx, s * sy);
   c.translate(-W / 2 - PAD, -H - PAD);
   c.globalAlpha = o.alpha == null ? 1 : o.alpha;
   c.drawImage(rim, 0, 0);

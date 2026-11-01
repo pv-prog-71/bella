@@ -25,6 +25,7 @@ function drawBellaWorld(c) {
     run,
     phase: b.phase,
     air: b.air,
+    vy: b.vy,
     t: G.t,
     alpha,
     squash: b.squash,
