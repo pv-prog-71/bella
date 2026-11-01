@@ -50,6 +50,19 @@ function bellaBuild(img) {
   BELLA.rim = mkc(W + 24, H + 24);
   BELLA.ready = true;
 }
+// the barking head (mouth open) is patched into a copy of the body, which bellaDraw uses while Bella barks
+function bellaBuildBark(img) {
+  if (!BELLA.ready) return;
+  const S = BELLA.S,
+    P = BELLA.parts,
+    c = mkc(BELLA.W, BELLA.H),
+    x = c.getContext('2d'),
+    hx = Math.round(232 * S);
+  x.drawImage(P.body, 0, 0);
+  x.clearRect(hx, 0, BELLA.W - hx, Math.round(140 * S));
+  x.drawImage(img, hx, 0, Math.round(img.width * S), Math.round(img.height * S));
+  BELLA.bodyBark = c;
+}
 // feet-centre anchored. o: {face, phase(run), air(-1 up..1 down), t, alpha, glow:[r,g,b,a], squash, tremble, scale, rim}
 function bellaDraw(c, x, y, o) {
   const s = (100 / BELLA.W) * (o.scale || 1),
@@ -92,8 +105,8 @@ function bellaDraw(c, x, y, o) {
     L = [c2, c1, c1, c2];
   }
   const ta = o.scared
-    ? Math.sin((o.t || 0) * 9) * 0.05 - 0.35 // scared: tail tucked down, barely wagging
-    : Math.sin((o.t || 0) * (run ? 14 : 7)) * (run ? 0.2 : 0.16) + (run ? 0.12 : 0); // tail wags harder, and streams behind when running
+    ? -0.35 // scared (alternate world): tail tucked down and still
+    : Math.sin((o.t || 0) * (run ? 14 : 9)) * (run ? 0.2 : 0.26) + (run ? 0.12 : 0); // happy and curious: lively wag // tail wags harder, and streams behind when running
   const part = (p, piv, ang, lift) => {
     tc.save();
     tc.translate(piv[0], piv[1] - (lift || 0));
@@ -105,7 +118,7 @@ function bellaDraw(c, x, y, o) {
   part(P.tail, V.tail, ta);
   part(P.rfar, V.rfar, A[0], L[0]); // far legs behind the body
   part(P.ffar, V.ffar, A[2], L[2]);
-  tc.drawImage(P.body, 0, 0);
+  tc.drawImage(o.bark > 0 && BELLA.bodyBark ? BELLA.bodyBark : P.body, 0, 0); // mouth open while barking
   part(P.rnear, V.rnear, A[1], L[1]); // near legs in front
   part(P.fnear, V.fnear, A[3], L[3]);
   tc.restore();
@@ -145,7 +158,7 @@ function bellaDraw(c, x, y, o) {
   } else {
     sy *= 1 + breathe * 0.012;
   }
-  c.translate(x + (o.tremble ? Math.sin((o.t || 0) * 40) * 1.4 : 0), y + bob);
+  c.translate(x + (o.tremble ? Math.sin((o.t || 0) * 40) * 1.4 : 0), y + bob + 4.5 * (o.scale || 1)); // a few pixels lower: she stands ON the ground, not above it
   c.rotate(face * pitch);
   c.scale(face * s * sx, s * sy);
   c.translate(-W / 2 - PAD, -H - PAD);

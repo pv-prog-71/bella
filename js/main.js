@@ -75,8 +75,19 @@ window.addEventListener('keydown', e => {
     ['500', '600'].forEach(w => document.fonts && document.fonts.load(`${w} 20px Fredoka`));
   } catch (e) {}
   const img = new Image();
-  img.onload = () => bellaBuild(img);
+  img.onload = () => {
+    bellaBuild(img);
+    const head = new Image(); // the barking head is a small extra picture: if it fails to load, Bella simply barks with her mouth closed
+    head.onload = () => bellaBuildBark(head);
+    head.src = BELLA_HEAD_SRC;
+  };
   img.src = BELLA_SRC;
+  // every Bella bark (jump, snake, idle...) also opens her mouth for a moment
+  const sfx0 = SND.sfx;
+  SND.sfx = function (n) {
+    if (n === 'bella_bark' && G.bella) G.bella.bark = 1;
+    return sfx0.apply(this, arguments);
+  };
   loadSave();
   console.info(
     `Bella's Journey v${GAME_VERSION} (GDD v${GDD_REF.gdd}, Addendum v${GDD_REF.addendum})`
