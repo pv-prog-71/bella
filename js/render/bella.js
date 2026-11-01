@@ -29,8 +29,10 @@ function bellaBuild(img) {
   b.restore();
   const bodyFull = mkc(W, H); // body with all four legs, as in the photo: used while she stands still (crisp, no cut edges)
   bodyFull.getContext('2d').drawImage(body, 0, 0);
-  bodyFull.getContext('2d').clearRect(0, 0, q(84), q(88)); // the tail is a separate part (it wags), so it is removed from the body
-  b.clearRect(0, 0, q(84), q(88));
+  // the tail is a separate part (it wags): only the tail itself (a polygon above the back line), not the rump, is cut out of the body
+  const TAILPOLY = [[0, 30], [80, 30], [80, 66], [68, 86], [40, 89], [12, 89], [0, 72]];
+  const polyPath = (cx, ox, oy) => { cx.beginPath(); TAILPOLY.forEach((pt, i) => cx[i ? 'lineTo' : 'moveTo'](q(pt[0]) - ox, q(pt[1]) - oy)); cx.closePath(); };
+  [bodyFull.getContext('2d'), b].forEach(cx => { cx.save(); polyPath(cx, 0, 0); cx.clip(); cx.clearRect(0, 0, W, H); cx.restore(); });
   // the four legs are drawn separately so they can swing (near pair in front of the body, far pair behind it). They are taken
   // out of the body from y=212 down, so no second set of legs shows next to the swinging ones; the upper part stays, no gap opens.
   const legs = {
@@ -42,7 +44,13 @@ function bellaBuild(img) {
   legs.fnear.c.getContext('2d').clearRect(q(212) - legs.fnear.x, 0, q(40), q(252) - legs.fnear.y); // the far front leg is not part of the near one
   b.clearRect(q(0), q(212), q(94), H - q(212));
   b.clearRect(q(184), q(212), q(66), H - q(212));
-  BELLA.parts = Object.assign({ body, bodyFull, tail: crop(0, 34, 84, 88) }, legs);
+  const tail = crop(0, 34, 84, 88);
+  const tcx = tail.c.getContext('2d');
+  tcx.globalCompositeOperation = 'destination-in';
+  polyPath(tcx, tail.x, tail.y);
+  tcx.fill();
+  tcx.globalCompositeOperation = 'source-over';
+  BELLA.parts = Object.assign({ body, bodyFull, tail }, legs);
   BELLA.piv = {
     tail: [q(30), q(86)],
     rfar: [q(72), q(196)],
