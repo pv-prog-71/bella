@@ -34,6 +34,32 @@ function drawHUD(c) {
     hf > 0.5 ? '#6adf6a' : hf > 0.25 ? '#e8c84a' : '#e85a4a',
     hf > 0.5 ? '#b8f060' : hf > 0.25 ? '#f0e070' : '#f08a5a'
   );
+  // jump button (touch devices only)
+  ui.jumpRect = null;
+  if (touch.seen && !modal && !G.sub) {
+    const jx = W - 70,
+      jy = 405,
+      jr = 44;
+    ui.jumpRect = { x: jx - jr - 8, y: jy - jr - 8, w: jr * 2 + 16, h: jr * 2 + 16 };
+    c.save();
+    c.globalAlpha = touch.jumpHeld ? 0.9 : 0.5;
+    c.fillStyle = 'rgba(10,14,18,0.75)';
+    c.beginPath();
+    c.arc(jx, jy, jr, 0, Math.PI * 2);
+    c.fill();
+    c.lineWidth = 3;
+    c.strokeStyle = '#e8f0ee';
+    c.stroke();
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    c.lineWidth = 6;
+    c.beginPath();
+    c.moveTo(jx - 16, jy + 6);
+    c.lineTo(jx, jy - 10);
+    c.lineTo(jx + 16, jy + 6);
+    c.stroke();
+    c.restore();
+  }
   // menu button
   if (!modal)
     addBtn(

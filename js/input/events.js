@@ -14,6 +14,18 @@ function setTouchDir(x) {
 }
 cv.addEventListener('pointerdown', e => {
   ensureAudio();
+  if (e.pointerType !== 'mouse') {
+    touch.seen = true;
+    if (!touch.fs) {
+      // first touch: go full screen and lock landscape where the browser allows it (iPhone Safari does not)
+      touch.fs = true;
+      try {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {});
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+      } catch (x) {}
+    }
+  }
   try {
     cv.focus({ preventScroll: true });
   } catch (x) {}
@@ -35,6 +47,15 @@ cv.addEventListener('pointerdown', e => {
     return;
   }
   if (e.pointerType !== 'mouse' && G.state === 'play' && !G.paused && !G.dialog) {
+    if (ui.jumpRect && p.x >= ui.jumpRect.x && p.x <= ui.jumpRect.x + ui.jumpRect.w && p.y >= ui.jumpRect.y && p.y <= ui.jumpRect.y + ui.jumpRect.h) {
+      // on-screen jump button: held = higher jump, a second finger can keep walking
+      touch.jumpHeld = true;
+      touch.jumpPid = e.pointerId;
+      try {
+        cv.setPointerCapture(e.pointerId);
+      } catch (x) {}
+      return;
+    }
     if (!touch.hinted) {
       touch.hinted = true;
       toast(tr('toast.touch'), 7);
@@ -70,6 +91,10 @@ cv.addEventListener('pointermove', e => {
   }
 });
 function endTouch(e) {
+  if (e.pointerId === touch.jumpPid) {
+    touch.jumpHeld = false;
+    touch.jumpPid = null;
+  }
   if (e.pointerId === touch.pid) {
     touch.active = false;
     touch.left = touch.right = false;

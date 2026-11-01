@@ -85,9 +85,17 @@ noscript {
 
 /* phones held upright: ask to rotate (the game is landscape) */
 #rotate { display: none; }
-@media (orientation: portrait) and (pointer: coarse) and (max-width: 700px) {
+#rotate svg { width: 84px; height: 84px; animation: rot 2.4s ease-in-out infinite; }
+#rotate .sub { color: #8a9a98; font-size: 14px; }
+@keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
   #rotate {
-    display: grid; place-items: center; position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; position: fixed; inset: 0; z-index: 10;
     background: #070b10; color: #e8f0ee; font: 600 18px/1.4 system-ui, sans-serif; text-align: center; padding: 24px;
   }
+}
+/* touch devices: the picture fills the whole screen */
+@media (pointer: coarse) {
+  body { padding: 0; }
+  #game { border-radius: 0; box-shadow: none; }
 }
