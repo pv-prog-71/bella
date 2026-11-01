@@ -31,8 +31,9 @@ function bellaBuild(img) {
   bodyFull.getContext('2d').drawImage(body, 0, 0);
   // the tail is a separate part (it wags): only the tail itself (a polygon above the back line), not the rump, is cut out of the body
   const TAILPOLY = [[0, 30], [80, 30], [80, 66], [68, 86], [40, 89], [12, 89], [0, 72]];
-  const polyPath = (cx, ox, oy) => { cx.beginPath(); TAILPOLY.forEach((pt, i) => cx[i ? 'lineTo' : 'moveTo'](q(pt[0]) - ox, q(pt[1]) - oy)); cx.closePath(); };
-  [bodyFull.getContext('2d'), b].forEach(cx => { cx.save(); polyPath(cx, 0, 0); cx.clip(); cx.clearRect(0, 0, W, H); cx.restore(); });
+  const TAILPART = [[0, 30], [80, 30], [80, 66], [68, 86], [70, 93], [28, 95], [12, 89], [0, 72]]; // the moving tail also covers a bit of rump, so it never tears away from the back
+  const polyPath = (cx, ox, oy, poly) => { cx.beginPath(); (poly || TAILPOLY).forEach((pt, i) => cx[i ? 'lineTo' : 'moveTo'](q(pt[0]) - ox, q(pt[1]) - oy)); cx.closePath(); };
+  [bodyFull.getContext('2d'), b].forEach(cx => { cx.save(); cx.globalCompositeOperation = 'destination-out'; polyPath(cx, 0, 0); cx.fill(); cx.restore(); }); // (no clip(): Safari handles it badly)
   // the four legs are drawn separately so they can swing (near pair in front of the body, far pair behind it). They are taken
   // out of the body from y=212 down, so no second set of legs shows next to the swinging ones; the upper part stays, no gap opens.
   const legs = {
@@ -44,15 +45,15 @@ function bellaBuild(img) {
   legs.fnear.c.getContext('2d').clearRect(q(212) - legs.fnear.x, 0, q(40), q(252) - legs.fnear.y); // the far front leg is not part of the near one
   b.clearRect(q(0), q(212), q(94), H - q(212));
   b.clearRect(q(184), q(212), q(66), H - q(212));
-  const tail = crop(0, 34, 84, 88);
+  const tail = crop(0, 34, 84, 96);
   const tcx = tail.c.getContext('2d');
   tcx.globalCompositeOperation = 'destination-in';
-  polyPath(tcx, tail.x, tail.y);
+  polyPath(tcx, tail.x, tail.y, TAILPART);
   tcx.fill();
   tcx.globalCompositeOperation = 'source-over';
   BELLA.parts = Object.assign({ body, bodyFull, tail }, legs);
   BELLA.piv = {
-    tail: [q(30), q(86)],
+    tail: [q(46), q(88)],
     rfar: [q(72), q(196)],
     rnear: [q(38), q(196)],
     ffar: [q(222), q(196)],
@@ -122,7 +123,7 @@ function bellaDraw(c, x, y, o) {
   }
   const ta = o.scared
     ? -0.35 // scared (alternate world): tail tucked down and still
-    : Math.sin((o.t || 0) * (run ? 15 : 10)) * (run ? 0.38 : 0.5) + (run ? 0.12 : 0.05); // happy and curious: lively wag // tail wags harder, and streams behind when running
+    : Math.sin((o.t || 0) * (run ? 15 : 10)) * (run ? 0.24 : 0.3) + (run ? 0.1 : 0.03); // happy and curious: lively wag // tail wags harder, and streams behind when running
   const part = (p, piv, ang, lift) => {
     tc.save();
     tc.translate(piv[0], piv[1] - (lift || 0));
