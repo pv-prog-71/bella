@@ -92,7 +92,7 @@ function playUpdate(dt) {
   if (b.bark > 0) b.bark = Math.max(0, b.bark - dt * 1.7);
   if (G.barkT <= 0) {
     const idle = !G.alt && b.onGround && Math.abs(b.vx) < 20 && !G.sub && !G.dialog && !G.paused,
-      near = idle && L.enemies.some(e => typeof e.x === 'number' && (e.x - b.x) * b.face > 0 && Math.abs(e.x - b.x) < 480 && !e.dead && !e.gone && (!e.box || e.box()));
+      near = idle && L.enemies.some(e => typeof e.x === 'number' && (e.x - b.x) * b.face > 0 && Math.abs(e.x - b.x) < 200 && !e.dead && !e.gone && (!e.box || e.box()));
     if (!near) { G.barkQ = 0; G.barkT = 0.5; }
     else {
       SND.sfx('bella_bark'); // also opens the mouth (see main.js)
