@@ -13,6 +13,7 @@ function cameraTargetY() {
   const L = G.L,
     b = G.bella;
   if (!L.top) return 0;
+  if (L.lookDown) return 0; // a level asks for the ground-level view (e.g. the snake fleeing below Bella)
   if (b.onGround || b.standY == null) b.standY = b.y;
   let target = Math.min(0, b.standY - 330);
   target = Math.min(target, b.y - 140); // a high jump upwards: keep her on screen

@@ -85,10 +85,12 @@ function buildForest() {
     ) {
       p.hit = true;
       SND.sfx('rockhit');
+      setTimeout(() => SND.sfx('snake_hiss'), 150); // the snake hisses as it gets hit and runs away
       G.say(p.snakeX, GY - 60, tr('bubble.hsss'), 1.6);
       rock.vx = 0; // it keeps falling and lands on the ground by itself
       p.fleeT = 0;
     }
+    L.lookDown = p.hit && (p.fleeT < 2.2 || !!G.dialog); // camera down to the ground so the player sees the snake flee
     if (p.hit) {
       p.fleeT += dt;
       if (p.fleeT > 0.4) p.snakeX -= 230 * dt;
