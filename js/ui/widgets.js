@@ -72,3 +72,52 @@ function menuBtn(c, label, x, y, w, h, fn, opts) {
     500
   );
 }
+
+// A volume row: label, a bar and the value. Click (or tap) the bar to set it, left / right of the bar for -/+ 10%, keys Left / Right when focused.
+function sliderBtn(c, label, value, x, y, w, h, setFn) {
+  const bx = x + 118,
+    bw = w - 118 - 62;
+  const step = d => setFn(Math.max(0, Math.min(1, Math.round((value + d) * 10) / 10)));
+  const b = addBtn(
+    x,
+    y,
+    w,
+    h,
+    () => {
+      if (mouse.x >= bx - 6 && mouse.x <= bx + bw + 6) setFn(Math.max(0, Math.min(1, Math.round(((mouse.x - bx) / bw) * 10) / 10)));
+      else if (mouse.x < bx - 6) step(-0.1);
+      else step(0.1);
+    },
+    true
+  );
+  b.adj = d => step(d * 0.1);
+  const idx = ui.menu.length - 1,
+    hover = mouse.x >= x && mouse.x <= x + w && mouse.y >= y && mouse.y <= y + h;
+  if (hover && ui.hoverIdx !== idx && mouse.moved) ui.focus = idx;
+  const foc = ui.focus === idx;
+  c.save();
+  c.shadowColor = foc ? 'rgba(143,216,192,0.5)' : 'rgba(0,0,0,0)';
+  c.shadowBlur = foc ? 16 : 0;
+  rrect(c, x, y, w, h, 14);
+  c.fillStyle = foc ? 'rgba(24,44,46,0.92)' : 'rgba(10,18,22,0.78)';
+  c.fill();
+  c.restore();
+  rrect(c, x, y, w, h, 14);
+  c.lineWidth = foc ? 3 : 1.5;
+  c.strokeStyle = foc ? '#8fd8c0' : 'rgba(200,230,220,0.35)';
+  c.stroke();
+  T(c, label, x + 16, y + h / 2 + 7, 19, foc ? '#ffffff' : '#d6e6e0', 'left', 500);
+  rrect(c, bx, y + h / 2 - 5, bw, 10, 5);
+  c.fillStyle = 'rgba(255,255,255,0.14)';
+  c.fill();
+  if (value > 0) {
+    rrect(c, bx, y + h / 2 - 5, Math.max(10, bw * value), 10, 5);
+    c.fillStyle = foc ? '#8fd8c0' : '#6fb8a2';
+    c.fill();
+  }
+  c.beginPath();
+  c.arc(bx + bw * value, y + h / 2, 9, 0, Math.PI * 2);
+  c.fillStyle = '#f2fbf6';
+  c.fill();
+  T(c, Math.round(value * 100) + '%', x + w - 14, y + h / 2 + 7, 17, foc ? '#ffffff' : '#d6e6e0', 'right', 500);
+}

@@ -126,7 +126,10 @@ window.addEventListener('keydown', e => {
       ui.focus = (ui.focus + 1) % Math.max(1, ui.menu.length);
     else if (e.code === 'ArrowUp' || e.code === 'KeyW')
       ui.focus = (ui.focus - 1 + ui.menu.length) % Math.max(1, ui.menu.length);
-    else if (e.code === 'Enter' || e.code === 'Space') {
+    else if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.code === 'ArrowRight' || e.code === 'KeyD') {
+      const b = ui.menu[ui.focus]; // volume rows: left / right change the value
+      if (b && b.adj) b.adj(e.code === 'ArrowLeft' || e.code === 'KeyA' ? -1 : 1);
+    } else if (e.code === 'Enter' || e.code === 'Space') {
       const b = ui.menu[ui.focus];
       if (b) {
         SND.sfx('ui');

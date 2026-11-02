@@ -56,12 +56,7 @@ function drawTitle(c) {
       }
     ]);
   } else items.push([tr('menu.start'), startNewGame]);
-  items.push([
-    tr('menu.music', { state: tr(SND.musicOn ? 'menu.on' : 'menu.off') }),
-    () => {
-      SND.setMusicOn(!SND.musicOn);
-    }
-  ]);
+  items.push(...volumeItems());
   items.push([
     tr('menu.credits'),
     () => {
@@ -108,7 +103,10 @@ function drawTitle(c) {
       },
       { size: 19 }
     );
-  } else items.forEach((it, i) => menuBtn(c, it[0], 480, 178 + i * 56, 320, 46, it[1]));
+  } else {
+    const step = items.length > 5 ? 50 : 56;
+    items.forEach((it, i) => (it[2] ? sliderBtn(c, it[0], it[2].value, 480, 178 + i * step, 320, 44, it[2].set) : menuBtn(c, it[0], 480, 178 + i * step, 320, 44, it[1])));
+  }
   T(c, tr('title.noFlash'), 640, 512, 14, 'rgba(200,225,215,0.55)', 'center', 400);
   T(c, tr(COARSE || touch.seen ? 'title.controlsTouch' : 'title.controls'), 640, 530, 14, 'rgba(200,225,215,0.55)', 'center', 400);
 }
@@ -122,7 +120,14 @@ function drawPanelMenu(c, title, items) {
   c.strokeStyle = 'rgba(200,230,220,0.3)';
   c.stroke();
   T(c, title, 480, 166, 30, '#fff', 'center', 600);
-  items.forEach((it, i) => menuBtn(c, it[0], 340, 190 + i * 56, 280, 46, it[1]));
+  items.forEach((it, i) => (it[2] ? sliderBtn(c, it[0], it[2].value, 340, 190 + i * 56, 280, 46, it[2].set) : menuBtn(c, it[0], 340, 190 + i * 56, 280, 46, it[1])));
+}
+// the two volume rows (music and effects), shared by the title and the pause menu
+function volumeItems() {
+  return [
+    [tr('menu.musicVol'), null, { value: SND.musicVolume, set: v => SND.setMusicVolume(v) }],
+    [tr('menu.sfxVol'), null, { value: SND.sfxVolume, set: v => SND.setSfxVolume(v) }]
+  ];
 }
 function drawPause(c) {
   drawPanelMenu(c, tr('menu.paused'), [
@@ -132,10 +137,7 @@ function drawPause(c) {
         G.paused = false;
       }
     ],
-    [
-      tr('menu.music', { state: tr(SND.musicOn ? 'menu.on' : 'menu.off') }),
-      () => SND.setMusicOn(!SND.musicOn)
-    ],
+    ...volumeItems(),
     [
       tr('menu.quit'),
       () => {
@@ -150,7 +152,7 @@ function drawPause(c) {
   ]);
   if (!(COARSE || touch.seen)) {
     // keyboard shortcuts, shown under the pause menu (desktop only)
-    ['menu.k1', 'menu.k2', 'menu.k3', 'menu.k4'].forEach((k, i) => T(c, tr(k), 480, 400 + i * 24, 16, 'rgba(225,240,235,0.85)', 'center', 500));
+    ['menu.k1', 'menu.k2', 'menu.k3', 'menu.k4'].forEach((k, i) => T(c, tr(k), 480, 462 + i * 22, 15, 'rgba(225,240,235,0.85)', 'center', 500));
   }
 }
 function drawCredits(c) {

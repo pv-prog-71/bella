@@ -5,13 +5,26 @@
  * The files were rendered by project/art_tools/export_audio.js; replace them with any MP3 you like (same names).
  * Plain <audio> elements are used (not WebAudio) so it also works when the game is opened straight from a folder. */
 const SND = (function () {
-  const MUSIC_VOLUME = 0.9,
-    SFX_VOLUME = 0.8,
+  const SFX_GAIN = { snake_hiss: 0.5, shadowalert: 0.7 }, // effects that are louder or more annoying than the rest are tamed
     LOOP_OVERLAP = 2.5, // seconds: the end of a loop fades out while the start of the next one fades in
     SFX_COPIES = 3; // how many copies of each effect can overlap
 
+  // two separate volumes, 0..1, saved in the browser (music was too loud next to the effects)
+  let musicVolume = 0.45,
+    sfxVolume = 0.7,
+    lastMusicVolume = 0.45;
+  try {
+    const saved = JSON.parse(localStorage.getItem('bella-audio') || 'null');
+    if (saved && typeof saved.music === 'number') musicVolume = Math.max(0, Math.min(1, saved.music));
+    if (saved && typeof saved.sfx === 'number') sfxVolume = Math.max(0, Math.min(1, saved.sfx));
+    if (musicVolume > 0) lastMusicVolume = musicVolume;
+  } catch (e) {}
+  function saveVolumes() {
+    try {
+      localStorage.setItem('bella-audio', JSON.stringify({ music: musicVolume, sfx: sfxVolume }));
+    } catch (e) {}
+  }
   let ready = false,
-    musicOn = true,
     requestedTheme = null, // the theme name the game asked for ('forest', 'alt'...)
     tracks = {}, // 'normal' / 'alt' -> track
     sfxPool = {}; // effect name -> list of <audio> elements
@@ -64,8 +77,8 @@ const SND = (function () {
         other.currentTime = 0;
         other.play().catch(() => {});
       }
-      setElementVolume(playing, track.fade * MUSIC_VOLUME * playingLevel);
-      setElementVolume(other, track.fade * MUSIC_VOLUME * otherLevel);
+      setElementVolume(playing, track.fade * musicVolume * playingLevel);
+      setElementVolume(other, track.fade * musicVolume * otherLevel);
 
       if (track.fade === 0 && track.fadeTarget === 0) {
         // fully faded out: stop it
@@ -99,26 +112,36 @@ const SND = (function () {
     requestedTheme = theme;
     if (!ready) return;
     const fade = fadeSeconds == null ? 2.5 : fadeSeconds;
-    const wanted = theme && musicOn ? tracks[trackFor(theme)] : null;
+    const wanted = theme && musicVolume > 0 ? tracks[trackFor(theme)] : null;
     Object.values(tracks).forEach(track => {
       if (track !== wanted && track.playing) stopTrack(track, fade);
     });
     if (wanted) startTrack(wanted, fade);
   }
 
+  function setMusicVolume(v) {
+    const was = musicVolume;
+    musicVolume = Math.max(0, Math.min(1, Math.round(v * 20) / 20));
+    if (musicVolume > 0) lastMusicVolume = musicVolume;
+    saveVolumes();
+    if (ready && (was === 0) !== (musicVolume === 0)) music(requestedTheme, 0.4); // starts / stops the track
+  }
+  function setSfxVolume(v) {
+    sfxVolume = Math.max(0, Math.min(1, Math.round(v * 20) / 20));
+    saveVolumes();
+  }
   function setMusicOn(on) {
-    musicOn = on;
-    if (!ready) return;
-    music(requestedTheme, 0.4);
+    // M key: mute / unmute the music (back to the last level)
+    setMusicVolume(on ? lastMusicVolume || 0.45 : 0);
   }
 
   /* ---------- sound effects ---------- */
   function sfx(name) {
     const pool = sfxPool[name];
-    if (!ready || !pool) return;
+    if (!ready || !pool || sfxVolume <= 0) return;
     const el = pool.find(e => e.paused || e.ended) || pool[0];
     el.currentTime = 0;
-    setElementVolume(el, SFX_VOLUME);
+    setElementVolume(el, sfxVolume * (SFX_GAIN[name] || 1));
     el.play().catch(() => {});
   }
 
@@ -144,8 +167,16 @@ const SND = (function () {
     music,
     sfx,
     setMusicOn,
+    setMusicVolume,
+    setSfxVolume,
+    get musicVolume() {
+      return musicVolume;
+    },
+    get sfxVolume() {
+      return sfxVolume;
+    },
     get musicOn() {
-      return musicOn;
+      return musicVolume > 0;
     },
     get ready() {
       return ready;
