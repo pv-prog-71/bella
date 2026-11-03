@@ -1,0 +1,25 @@
+Bella's Journey
+Copyright (c) 2026 PV. All rights reserved.
+
+Game design: PV.
+
+No open-source licence has been granted. Without the author's written permission nobody may
+copy, modify, redistribute or sell this game or any part of it.
+
+
+ORIGIN OF THE ASSETS
+--------------------
+
+- Bella sprite (assets/images/bella.png)
+  A photograph of the author's own dog, taken by PV. Rights: PV.
+
+- Fredoka font (assets/fonts/Fredoka-var-latin.woff)
+  Copyright (c) The Fredoka Project Authors, from Google Fonts.
+  Licence: SIL Open Font License 1.1 - commercial use and redistribution together with the
+  software are allowed. The licence text is in assets/fonts/OFL.txt and must stay with the font.
+  The font may not be sold on its own.
+
+- Everything else
+  All other images (assets/images), music and sound effects (assets/audio) and all code
+  (index.html, style.css, js/, lang/) were created for this project. They contain no
+  third-party samples, images or libraries.
