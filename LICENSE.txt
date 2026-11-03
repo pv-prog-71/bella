@@ -1,7 +1,5 @@
 Bella's Journey
-Copyright (c) 2026 PV. All rights reserved.
-
-Game design: PV.
+Copyright (c) 2026 All rights reserved.
 
 No open-source licence has been granted. Without the author's written permission nobody may
 copy, modify, redistribute or sell this game or any part of it.
